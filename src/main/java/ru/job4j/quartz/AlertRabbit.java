@@ -17,29 +17,44 @@ import static org.quartz.TriggerBuilder.*;
 import static org.quartz.SimpleScheduleBuilder.*;
 
 public class AlertRabbit {
-    public static void main(String[] args) {
-        try {
-            List<Long> store = new ArrayList<>();
-            Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-            scheduler.start();
-            JobDataMap data = new JobDataMap();
-            data.put("store", store);
-            JobDetail job = newJob(Rabbit.class)
-                    .usingJobData(data)
-                    .build();
-            SimpleScheduleBuilder times = simpleSchedule()
-                    .withIntervalInSeconds(readSettings())
-                    .repeatForever();
-            Trigger trigger = newTrigger()
-                    .startNow()
-                    .withSchedule(times)
-                    .build();
-            scheduler.scheduleJob(job, trigger);
-            Thread.sleep(5000);
-            scheduler.shutdown();
-            System.out.println(store);
-        } catch (Exception se) {
-            se.printStackTrace();
+    public static void main(String[] args) throws SQLException, IOException, ClassNotFoundException {
+        try (Connection connection = getConnection()) {
+            try {
+                List<Long> store = new ArrayList<>();
+                Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+                scheduler.start();
+                JobDataMap data = new JobDataMap();
+                data.put("store", store);
+                JobDetail job = newJob(Rabbit.class)
+                        .usingJobData(data)
+                        .build();
+                SimpleScheduleBuilder times = simpleSchedule()
+                        .withIntervalInSeconds(readSettings())
+                        .repeatForever();
+                Trigger trigger = newTrigger()
+                        .startNow()
+                        .withSchedule(times)
+                        .build();
+                scheduler.scheduleJob(job, trigger);
+                Thread.sleep(10000);
+                scheduler.shutdown();
+                System.out.println(store);
+            } catch (Exception se) {
+                se.printStackTrace();
+            }
+        }
+    }
+
+    private static Connection getConnection() throws IOException, ClassNotFoundException, SQLException {
+        try (InputStream is = Rabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
+            Properties properties = new Properties();
+            properties.load(is);
+            Class.forName(properties.getProperty("driver"));
+            return DriverManager.getConnection(
+                    properties.getProperty("url"),
+                    properties.getProperty("username"),
+                    properties.getProperty("password")
+            );
         }
     }
 
@@ -53,25 +68,9 @@ public class AlertRabbit {
         return seconds;
     }
 
-    public static class Rabbit implements Job, AutoCloseable {
-        private Connection connection;
-
+    public static class Rabbit implements Job {
         public Rabbit() throws SQLException, IOException, ClassNotFoundException {
-            connect();
             System.out.println(hashCode());
-        }
-
-        private void connect() throws IOException, ClassNotFoundException, SQLException {
-            try (InputStream is = Rabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
-                Properties properties = new Properties();
-                properties.load(is);
-                Class.forName(properties.getProperty("driver"));
-                this.connection = DriverManager.getConnection(
-                        properties.getProperty("url"),
-                        properties.getProperty("username"),
-                        properties.getProperty("password")
-                );
-            }
         }
 
         @Override
@@ -79,13 +78,6 @@ public class AlertRabbit {
             System.out.println("Rabbit runs here ...");
             List<Long> store = (List<Long>) context.getJobDetail().getJobDataMap().get("store");
             store.add(System.currentTimeMillis());
-        }
-
-        @Override
-        public void close() throws Exception {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 }
