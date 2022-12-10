@@ -19,6 +19,8 @@ public class HabrCareerParse implements Parse {
     private static final String PAGE_LINK = String.format("%s/vacancies/java_developer?page=", SOURCE_LINK);
     private final DateTimeParser dateTimeParser;
 
+    private int id = 0;
+
     public HabrCareerParse(DateTimeParser dateTimeParser) {
         this.dateTimeParser = dateTimeParser;
     }
@@ -48,25 +50,29 @@ public class HabrCareerParse implements Parse {
         Connection connection;
         for (int i = 1; i <= 5; i++) {
             connection = Jsoup.connect(link + i);
-            try {
-                Document document = connection.get();
-                Elements rows = document.select(".vacancy-card__inner");
-                rows.forEach(row -> {
-                    Element titleElement = row.select(".vacancy-card__title").first();
-                    Element linkElement = Objects.requireNonNull(titleElement).child(0);
-                    Element dateElement = row.select(".vacancy-card__date").first();
-                    Element dateTime = Objects.requireNonNull(dateElement).child(0);
-                    String vacancyName = titleElement.text();
-                    String vacancyLink = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
-                    String description = retrieveDescription(vacancyLink);
-                    String date = dateTime.attr("datetime");
-                    LocalDateTime time = dateTimeParser.parse(date);
-                    posts.add(new Post(vacancyName, vacancyLink, description, time));
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            fillPosts(connection, posts);
         }
         return posts;
+    }
+
+    private void fillPosts(Connection connection, List<Post> posts) {
+        try {
+            Document document = connection.get();
+            Elements rows = document.select(".vacancy-card__inner");
+            rows.forEach(row -> {
+                Element titleElement = row.select(".vacancy-card__title").first();
+                Element linkElement = Objects.requireNonNull(titleElement).child(0);
+                Element dateElement = row.select(".vacancy-card__date").first();
+                Element dateTime = Objects.requireNonNull(dateElement).child(0);
+                String vacancyName = titleElement.text();
+                String vacancyLink = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
+                String description = retrieveDescription(vacancyLink);
+                String date = dateTime.attr("datetime");
+                LocalDateTime time = dateTimeParser.parse(date);
+                posts.add(new Post(id++, vacancyName, vacancyLink, description, time));
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
