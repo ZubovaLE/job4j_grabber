@@ -1,7 +1,13 @@
 package ru.job4j.grabber;
 
+import ru.job4j.quartz.AlertRabbit;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -15,8 +21,29 @@ public class PsqlStore implements Store, AutoCloseable {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
-        connection = DriverManager.getConnection(cfg.getProperty("jdbc.url"), cfg.getProperty("jdbc.username"),
-                cfg.getProperty("jdbc.password"));
+        connection = DriverManager.getConnection(cfg.getProperty("url"), cfg.getProperty("username"),
+                cfg.getProperty("password"));
+        try (Statement statement = connection.createStatement()) {
+            String sql = String.format(
+                    "CREATE TABLE IF NOT EXISTS post(%s, %s, %s, %s, %s);",
+                            "id SERIAL PRIMARY KEY",
+                            "name TEXT",
+                            "text TEXT",
+                            "link TEXT UNIQUE",
+                            "created TIMESTAMP"
+            );
+            statement.execute(sql);
+        }
+    }
+
+    private static Properties getProperties() {
+        Properties config = new Properties();
+        try (InputStream is = PsqlStore.class.getClassLoader().getResourceAsStream("app.properties")) {
+            config.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return config;
     }
 
     @Override
@@ -26,7 +53,7 @@ public class PsqlStore implements Store, AutoCloseable {
             statement.setString(1, post.getTitle());
             statement.setString(2, post.getDescription());
             statement.setString(3, post.getLink());
-            statement.setTimestamp(3, Timestamp.valueOf(post.getCreated()));
+            statement.setTimestamp(4, Timestamp.valueOf(post.getCreated()));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -60,7 +87,25 @@ public class PsqlStore implements Store, AutoCloseable {
 
     @Override
     public Post findById(int id) {
-        return null;
+        Post result = null;
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM post WHERE id = ?")) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    result = new Post(
+                            resultSet.getInt("id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("text"),
+                            resultSet.getString("link"),
+                            resultSet.getTimestamp("created").toLocalDateTime());
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     @Override
@@ -68,5 +113,20 @@ public class PsqlStore implements Store, AutoCloseable {
         if (connection != null) {
             connection.close();
         }
+    }
+
+    public static void main(String[] args) {
+        Properties cfg = getProperties();
+        try {
+            PsqlStore psqlStore = new PsqlStore(cfg);
+            Post postOne = new Post("name1", "link1", "description1", LocalDateTime.now());
+            psqlStore.save(postOne);
+            psqlStore.save(new Post("name2", "link2", "description2", LocalDateTime.now()));
+            System.out.println(psqlStore.findById(1));
+            System.out.println(psqlStore.getAll());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 }
