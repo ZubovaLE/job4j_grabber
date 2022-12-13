@@ -1,19 +1,17 @@
 package ru.job4j.grabber;
 
-import ru.job4j.quartz.AlertRabbit;
+import ru.job4j.grabber.utils.HarbCareerDateTimeParser;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 public class PsqlStore implements Store, AutoCloseable {
-    private Connection connection;
+    private final Connection connection;
 
     public PsqlStore(Properties cfg) throws SQLException {
         try {
@@ -26,11 +24,11 @@ public class PsqlStore implements Store, AutoCloseable {
         try (Statement statement = connection.createStatement()) {
             String sql = String.format(
                     "CREATE TABLE IF NOT EXISTS post(%s, %s, %s, %s, %s);",
-                            "id SERIAL PRIMARY KEY",
-                            "name TEXT",
-                            "text TEXT",
-                            "link TEXT UNIQUE",
-                            "created TIMESTAMP"
+                    "id SERIAL PRIMARY KEY",
+                    "name TEXT",
+                    "text TEXT",
+                    "link TEXT UNIQUE",
+                    "created TIMESTAMP"
             );
             statement.execute(sql);
         }
@@ -49,11 +47,12 @@ public class PsqlStore implements Store, AutoCloseable {
     @Override
     public void save(Post post) {
         try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+                "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) ON CONFLICT (link) DO NOTHING;", Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, post.getTitle());
             statement.setString(2, post.getDescription());
             statement.setString(3, post.getLink());
             statement.setTimestamp(4, Timestamp.valueOf(post.getCreated()));
+            statement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -95,8 +94,8 @@ public class PsqlStore implements Store, AutoCloseable {
                     result = new Post(
                             resultSet.getInt("id"),
                             resultSet.getString("name"),
-                            resultSet.getString("text"),
                             resultSet.getString("link"),
+                            resultSet.getString("text"),
                             resultSet.getTimestamp("created").toLocalDateTime());
                 }
             } catch (SQLException e) {
@@ -117,16 +116,15 @@ public class PsqlStore implements Store, AutoCloseable {
 
     public static void main(String[] args) {
         Properties cfg = getProperties();
+        HabrCareerParse habrCareerParse = new HabrCareerParse(new HarbCareerDateTimeParser());
         try {
             PsqlStore psqlStore = new PsqlStore(cfg);
-            Post postOne = new Post("name1", "link1", "description1", LocalDateTime.now());
-            psqlStore.save(postOne);
-            psqlStore.save(new Post("name2", "link2", "description2", LocalDateTime.now()));
+            List<Post> posts = habrCareerParse.list("https://career.habr.com/vacancies/java_developer?page=1");
+            posts.forEach(psqlStore::save);
             System.out.println(psqlStore.findById(1));
             System.out.println(psqlStore.getAll());
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 }
