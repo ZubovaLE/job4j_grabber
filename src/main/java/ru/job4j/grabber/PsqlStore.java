@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -21,17 +22,6 @@ public class PsqlStore implements Store, AutoCloseable {
         }
         connection = DriverManager.getConnection(cfg.getProperty("url"), cfg.getProperty("username"),
                 cfg.getProperty("password"));
-        try (Statement statement = connection.createStatement()) {
-            String sql = String.format(
-                    "CREATE TABLE IF NOT EXISTS post(%s, %s, %s, %s, %s);",
-                    "id SERIAL PRIMARY KEY",
-                    "name TEXT",
-                    "text TEXT",
-                    "link TEXT UNIQUE",
-                    "created TIMESTAMP"
-            );
-            statement.execute(sql);
-        }
     }
 
     private static Properties getProperties() {
@@ -114,17 +104,22 @@ public class PsqlStore implements Store, AutoCloseable {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         Properties cfg = getProperties();
         HabrCareerParse habrCareerParse = new HabrCareerParse(new HarbCareerDateTimeParser());
-        try {
+//        try {
             PsqlStore psqlStore = new PsqlStore(cfg);
-            List<Post> posts = habrCareerParse.list("https://career.habr.com/vacancies/java_developer?page=1");
-            posts.forEach(psqlStore::save);
-            System.out.println(psqlStore.findById(1));
-            System.out.println(psqlStore.getAll());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Post postOne = new Post("name1", "link1", "description1", LocalDateTime.now());
+        psqlStore.save(postOne);
+        psqlStore.save(new Post("name2", "link2", "description2", LocalDateTime.now()));
+        System.out.println(psqlStore.findById(1));
+        System.out.println(psqlStore.getAll());
+//            List<Post> posts = habrCareerParse.list("https://career.habr.com/vacancies/java_developer?page=1");
+//            posts.forEach(psqlStore::save);
+//            System.out.println(psqlStore.findById(1));
+//            System.out.println(psqlStore.getAll());
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
     }
 }
