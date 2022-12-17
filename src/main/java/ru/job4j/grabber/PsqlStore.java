@@ -16,7 +16,7 @@ public class PsqlStore implements Store, AutoCloseable {
 
     public PsqlStore(Properties cfg) throws SQLException {
         try {
-            Class.forName(cfg.getProperty("jdbc.driver"));
+            Class.forName(cfg.getProperty("driver"));
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -107,19 +107,14 @@ public class PsqlStore implements Store, AutoCloseable {
     public static void main(String[] args) throws SQLException {
         Properties cfg = getProperties();
         HabrCareerParse habrCareerParse = new HabrCareerParse(new HarbCareerDateTimeParser());
-//        try {
+        try {
             PsqlStore psqlStore = new PsqlStore(cfg);
-        Post postOne = new Post("name1", "link1", "description1", LocalDateTime.now());
-        psqlStore.save(postOne);
-        psqlStore.save(new Post("name2", "link2", "description2", LocalDateTime.now()));
-        System.out.println(psqlStore.findById(1));
-        System.out.println(psqlStore.getAll());
-//            List<Post> posts = habrCareerParse.list("https://career.habr.com/vacancies/java_developer?page=1");
-//            posts.forEach(psqlStore::save);
-//            System.out.println(psqlStore.findById(1));
-//            System.out.println(psqlStore.getAll());
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+            List<Post> posts = habrCareerParse.list("https://career.habr.com/vacancies/java_developer?page=1");
+            posts.forEach(psqlStore::save);
+            System.out.println(psqlStore.findById(1));
+            System.out.println(psqlStore.getAll());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
