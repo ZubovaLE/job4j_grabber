@@ -2,10 +2,14 @@ package ru.job4j.grabber;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import ru.job4j.grabber.utils.HarbCareerDateTimeParser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
@@ -13,9 +17,11 @@ import static org.quartz.TriggerBuilder.newTrigger;
 
 public class Grabber implements Grab {
     private final Properties cfg = new Properties();
+    private static final String SOURCE_LINK = "https://career.habr.com";
+    private static final String PAGE_LINK = String.format("%s/vacancies/java_developer?page=", SOURCE_LINK);
 
-    public Store store() {
-        return null;
+    public Store store() throws SQLException {
+        return new PsqlStore(cfg);
     }
 
     public Scheduler scheduler() throws SchedulerException {
@@ -54,6 +60,21 @@ public class Grabber implements Grab {
             JobDataMap map = jobExecutionContext.getJobDetail().getJobDataMap();
             Store store = (Store) map.get("store");
             Parse parse = (Parse) map.get("parse");
+            List<Post> posts;
+            try {
+                posts = parse.list(PAGE_LINK + 1).stream().filter(p -> p.getTitle().matches("java")).collect(Collectors.toList());
+                posts.forEach(store::save);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        Grabber grab = new Grabber();
+        grab.cfg();
+        Scheduler scheduler = grab.scheduler();
+        Store store = grab.store();
+        grab.init(new HabrCareerParse(new HarbCareerDateTimeParser()), store, scheduler);
     }
 }
