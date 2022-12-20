@@ -6,13 +6,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 public class PsqlStore implements Store, AutoCloseable {
     private final Connection connection;
+
+    public PsqlStore(Connection connection) {
+        this.connection = connection;
+    }
 
     public PsqlStore(Properties cfg) throws SQLException {
         try {
