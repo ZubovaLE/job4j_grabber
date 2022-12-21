@@ -40,12 +40,17 @@ public class PsqlStore implements Store, AutoCloseable {
     @Override
     public void save(Post post) {
         try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) ON CONFLICT (link) DO NOTHING;", Statement.RETURN_GENERATED_KEYS)) {
+                "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, post.getTitle());
             statement.setString(2, post.getDescription());
             statement.setString(3, post.getLink());
             statement.setTimestamp(4, Timestamp.valueOf(post.getCreated()));
-            statement.execute();
+            statement.executeUpdate();
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    post.setId(generatedKeys.getInt(1));
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -57,8 +62,6 @@ public class PsqlStore implements Store, AutoCloseable {
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM post")) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 fillPosts(posts, resultSet);
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -71,8 +74,8 @@ public class PsqlStore implements Store, AutoCloseable {
             posts.add(new Post(
                     resultSet.getInt("id"),
                     resultSet.getString("name"),
-                    resultSet.getString("text"),
                     resultSet.getString("link"),
+                    resultSet.getString("text"),
                     resultSet.getTimestamp("created").toLocalDateTime()));
         }
     }
@@ -115,7 +118,6 @@ public class PsqlStore implements Store, AutoCloseable {
             List<Post> posts = habrCareerParse.list("https://career.habr.com/vacancies/java_developer?page=1");
             posts.forEach(psqlStore::save);
             System.out.println(psqlStore.findById(1));
-            System.out.println(psqlStore.getAll());
         } catch (SQLException e) {
             e.printStackTrace();
         }

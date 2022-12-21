@@ -1,15 +1,14 @@
 package ru.job4j.grabber;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,6 +18,10 @@ import static org.hamcrest.Matchers.*;
 class PsqlStoreTest {
     private static Connection connection;
     private static PsqlStore store;
+
+    private Post postOne;
+    private Post postTwo;
+    private Post postThree;
 
     @BeforeAll
     public static void initConnection() {
@@ -35,6 +38,21 @@ class PsqlStoreTest {
             throw new IllegalStateException(e);
         }
         store = new PsqlStore(connection);
+        try (PreparedStatement statement = connection.prepareStatement("TRUNCATE TABLE post Restart IDENTITY;")) {
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @BeforeEach
+    public void fillTable() {
+        postOne = new Post("title1", "link1", "description1", LocalDateTime.now());
+        postTwo = new Post("title2", "link2", "description2", LocalDateTime.now());
+        postThree = new Post("title3", "link3", "description3", LocalDateTime.now());
+        store.save(postOne);
+        store.save(postTwo);
+        store.save(postThree);
     }
 
     @AfterAll
@@ -42,11 +60,26 @@ class PsqlStoreTest {
         connection.close();
     }
 
+    @AfterEach
+    public void wipeTable() throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("DELETE FROM post")) {
+            statement.execute();
+        }
+    }
+
     @Test
-    @DisplayName("FindById when add item then must get the same item")
-    public void whenSaveItemAndFindByGeneratedIdThenMustBeTheSame() {
-        Post post = new Post("title", "link", "description", LocalDateTime.now());
-        store.save(post);
-        assertThat(store.findById(1),is(post));
+    @DisplayName("FindById when id of postTwo then must get the second post")
+    public void findByGeneratedIdWhenIdOfPostTwoThenMustGetPostTwo() {
+        assertThat(store.findById(postTwo.getId()), is(postTwo));
+    }
+
+    @Test
+    @DisplayName("FindAll when three posts then get all posts")
+    public void findAllWhenThreePosts() {
+        List<Post> posts = store.getAll();
+        assertThat(posts.size(), is(3));
+        assertTrue(posts.contains(postOne));
+        assertTrue(posts.contains(postTwo));
+        assertTrue(posts.contains(postThree));
     }
 }
