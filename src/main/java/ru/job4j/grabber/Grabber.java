@@ -12,7 +12,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -45,40 +48,30 @@ public class Grabber implements Grab {
     }
 
     public void web(Store store) {
-        final String htmlDoc = "<html>"
-                + "<head>"
-                + "<meta charset=\"UTF-8\">"
-                + "<title>Java Вакансии</title>"
-                + "</head>"
-                + "<body>"
-                + "<h1>Java вакансии на %s</h1>"
-                + "<hr align=\"center\" size=\"2\" color=\"#000000\" />"
-                + "<br/>"
-                + "%s"
-                + "</body>"
-                + "</html>";
-        final String htmlPost = "<a href=\"%s\"><h3>№%d %s</h3></a>"
-                + "<p>ID: %d, Дата публикации: %s</p>"
-                + "<p>%s</p>"
-                + "<hr align=\"center\" size=\"1\" color=\"#000000\" />";
-        new Thread(() -> {
-            try (ServerSocket server = new ServerSocket(Integer.parseInt(cfg.getProperty("port")))) {
-                while (!server.isClosed()) {
-                    Socket socket = server.accept();
-                    try (OutputStream out = socket.getOutputStream()) {
-                        out.write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
-                        for (Post post : store.getAll()) {
-                            out.write(post.toString().getBytes());
-                            out.write(LINE_SEPARATOR.getBytes());
-                        }
-                    } catch (IOException io) {
-                        io.printStackTrace();
+        try (ServerSocket server = new ServerSocket(Integer.parseInt(cfg.getProperty("port")))) {
+            while (!server.isClosed()) {
+                Socket socket = server.accept();
+                try (OutputStream out = socket.getOutputStream()) {
+                    out.write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
+                    for (Post post : store.getAll()) {
+                        out.write(post.getTitle().getBytes((Charset.forName("Windows-1251"))));
+                        out.write(LINE_SEPARATOR.getBytes((Charset.forName("Windows-1251"))));
+                        out.write(post.getCreated().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss"))
+                                .getBytes((Charset.forName("Windows-1251"))));
+                        out.write(LINE_SEPARATOR.getBytes((Charset.forName("Windows-1251"))));
+                        out.write(post.getLink().getBytes((Charset.forName("Windows-1251"))));
+                        out.write(LINE_SEPARATOR.getBytes((Charset.forName("Windows-1251"))));
+                        out.write(post.getDescription().getBytes((Charset.forName("Windows-1251"))));
+                        out.write(LINE_SEPARATOR.getBytes((Charset.forName("Windows-1251"))));
+                        out.write(LINE_SEPARATOR.getBytes((Charset.forName("Windows-1251"))));
                     }
+                } catch (IOException io) {
+                    io.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -109,7 +102,10 @@ public class Grabber implements Grab {
             Parse parse = (Parse) map.get("parse");
             List<Post> posts;
             try {
-                posts = parse.list(PAGE_LINK).stream().filter(p -> StringUtils.containsIgnoreCase(p.getTitle(), "java")).collect(Collectors.toList());
+                posts = parse.list(PAGE_LINK).stream()
+                        .filter(p -> StringUtils.containsIgnoreCase(p.getTitle(), "java"))
+                        .sorted(Comparator.comparing(Post::getCreated).reversed())
+                        .collect(Collectors.toList());
                 posts.forEach(store::save);
                 LOGGER.info("Finished finding new posts");
             } catch (Exception e) {

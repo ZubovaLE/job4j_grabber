@@ -403,3 +403,15 @@ merge into post using (values (?, ?, ?, ?)) p(name, text, link, created) on post
 	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
 	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
 	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
+2022-12-23 20:40:11 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Синтаксическая ошибка в выражении SQL "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) [*]ON CONFLICT(link) DO NOTHING;"
+Syntax error in SQL statement "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) [*]ON CONFLICT(link) DO NOTHING;"; SQL statement:
+INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) ON CONFLICT(link) DO NOTHING; [42000-214]
+2022-12-23 20:40:11 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Синтаксическая ошибка в выражении SQL "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) [*]ON CONFLICT(link) DO NOTHING;"
+Syntax error in SQL statement "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) [*]ON CONFLICT(link) DO NOTHING;"; SQL statement:
+INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) ON CONFLICT(link) DO NOTHING; [42000-214]
+2022-12-23 20:40:11 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Синтаксическая ошибка в выражении SQL "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) [*]ON CONFLICT(link) DO NOTHING;"
+Syntax error in SQL statement "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) [*]ON CONFLICT(link) DO NOTHING;"; SQL statement:
+INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) ON CONFLICT(link) DO NOTHING; [42000-214]
