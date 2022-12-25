@@ -29,7 +29,7 @@ public class AlertRabbit {
         return Integer.parseInt(properties.getProperty("rabbit.interval"));
     }
 
-    private static Connection getConnection(Properties properties) throws IOException, ClassNotFoundException, SQLException {
+    private static Connection getConnection(Properties properties) throws ClassNotFoundException, SQLException {
         Class.forName(properties.getProperty("driver"));
         return DriverManager.getConnection(
                 properties.getProperty("url"),
@@ -38,7 +38,7 @@ public class AlertRabbit {
         );
     }
 
-    public static void main(String[] args) throws SQLException, IOException, ClassNotFoundException {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
         Properties properties = getProperties();
         try (Connection connection = getConnection(properties)) {
             try {
