@@ -24,10 +24,10 @@
 20. [Что такое view(Представление)?](#20-Что-такое-view-Представление)
 21. [Что такое JDBC?](#21-Что-такое-JDBC)
 22. [Что нужно для работы с той или иной БД?](#22-Что-нужно-для-работы-с-той-или-иной-БД)
-23. [Как зарегистрировать драйвер?](#)
-24. [Как получить Connection?](#)
-25. [Что такое Statement, PrepareStatement? В чем разница между ними?](#)
-26. [Что такое ResultSet?](#)
+23. [Как зарегистрировать драйвер?](#23-Как-зарегистрировать-драйвер)
+24. [Как получить Connection?](#24-Как-получить-Connection)
+25. [Что такое Statement, PrepareStatement? В чем разница между ними?](#25-Что-такое-Statement-PrepareStatement-В-чем-разница-между-ними)
+26. [Что такое ResultSet?](#26-Что-такое-ResultSet)
 27. [В чем разница между методами execute, executeUpdate, executeQueury?](#)
 28. [Можно ли использовать возвращаемое значение execute() для проверки, что что-то обновилось?](#)
 29. [Как получить при вставке сгенерированные ключи? Как это сделать на чистом sql?](#)
@@ -169,7 +169,7 @@ create table passport_people
 
 ```sql
 INSERT INTO table_name(attr1, attrN)
-VALUES (attr1_value, attrN_value) l
+VALUES (attr1_value, attrN_value);
 ```
 
 Для удаления данных используется команда _DELETE_:
@@ -268,7 +268,8 @@ JDBC – это API, т.е. набор вспомогательных класс
 
 ## 22 Что нужно для работы с той или иной БД?
 
-Драйвер
+Для работы с той или иной БД нужен _драйвер_. Драйвер позволяет поддерживать подключения, выполнять запросы и т.д. Для
+каждой БД есть свой драйвер. Чтобы добавить драйвер в проект необходимо добавить зависимость на этот самый драйвер.
 
 [К огавлению &#8593;](#Оглавление)
 
@@ -281,20 +282,66 @@ Class.forName(cfg.getProperty("driver"));
 
 ## 24 Как получить Connection?
 
-Properties cfg;
+Properties cfg;  
 Connection connection = DriverManager.getConnection(cfg.getProperty("url"), cfg.getProperty("username"),
 cfg.getProperty("password"));
 [К огавлению &#8593;](#Оглавление)
 
 ## 25 Что такое Statement, PrepareStatement? В чем разница между ними?
 
+Statement, PrepareStatement - интерфейсы для исполнения операций в БД.  
+Отличием PrepareStatement от Statement является то, что он используется для выполнения параметризованных SQL-запросов.
+
+Рассмотрим интерфейс Statement:
+
+```java
+try(Connection connection=getConnection()){
+        try(Statement statement=connection.createStatement()){
+```
+
+Cоздали объект для запроса. Для его выполнения существуют 3 метода: execute(), executeUpdate(), executeQuery(). При их
+вызове мы должны передать в качестве аргумента SQL - запрос.
+
 [К огавлению &#8593;](#Оглавление)
 
 ## 26 Что такое ResultSet?
 
+ResultSet - это объект, который позволяет пройтись по результатам запроса
+
 [К огавлению &#8593;](#Оглавление)
 
 ## 27 В чем разница между методами execute, executeUpdate, executeQueury?
+
++ executeUpdate()
+
+Данный метод используется как для выполнения операторов управления данными (DML - операторы), например INSERT, UPDATE
+или DELETE, так и для операторов определения структуры базы данных (DDL - операторы), например CREATE TABLE, DROP TABLE.
+Возвращает int – количество affected строк, т.е. количество строк на которые оказал влияние запрос. Для операторов,
+которые не манипулируют строками, таких как CREATE TABLE или DROP TABLE, возвращаемое значение executeUpdate всегда
+равно нулю.
+
++ executeQuery()
+
+Как правило, этот метод используется для выполнения операции SELECT и возвращает объект ResultSet, который позволяет
+пройтись по результатам запроса.
+
++ execute()
+
+Используется для выполнения любых команд. Возвращает true, если результатом выполнения является ResultSet (то есть был
+выполнен SELECT запрос), или false, если результатом является int (количество изменённых строк). Получить ResultSet или
+количество строк мы можем с помощью последующего вызова getUpdateCount() или getResultSet().
+
+```java
+statement.execute(sql);
+        int count=statement.getUpdateCount();
+        /* эквивалентно */
+        int count=statement.executeUpdate(sql);
+
+        statement.execute(sql);
+        ResultSet result=statement.getResultSet();
+        /* эквивалентно */
+        ResultSet result=statement.executeQuery(sql);
+```
 
 [К оглавлению &#8593;](#Оглавление)
 
