@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 
 import static org.quartz.JobBuilder.*;
@@ -19,8 +21,8 @@ public class AlertRabbit {
     private static final Logger LOGGER = LoggerFactory.getLogger(AlertRabbit.class);
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        Properties properties = getProperties();
-        try (Connection connection = getConnection(properties)) {
+        Optional<Properties> properties = getProperties();
+        try (Connection connection = getConnection(Objects.requireNonNull(properties.orElse(null)))) {
             try {
                 Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
                 scheduler.start();
@@ -30,7 +32,7 @@ public class AlertRabbit {
                         .usingJobData(data)
                         .build();
                 SimpleScheduleBuilder times = simpleSchedule()
-                        .withIntervalInSeconds(readInterval(properties))
+                        .withIntervalInSeconds(readInterval(properties.orElse(null)))
                         .repeatForever();
                 Trigger trigger = newTrigger()
                         .startNow()
@@ -45,14 +47,15 @@ public class AlertRabbit {
         }
     }
 
-    private static Properties getProperties() {
-        Properties config = new Properties();
-        try (InputStream is = AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
+    private static Optional<Properties> getProperties() {
+        Properties config = null;
+        try (InputStream is = ClassLoader.getSystemResourceAsStream("rabbit.properties")) {
+            config = new Properties();
             config.load(is);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return config;
+        return Optional.of(config);
     }
 
     private static int readInterval(Properties properties) throws NumberFormatException {
@@ -73,12 +76,20 @@ public class AlertRabbit {
         public void execute(JobExecutionContext context) {
             System.out.println("Rabbit runs here ...");
             Connection connection = (Connection) context.getJobDetail().getJobDataMap().get("DB");
-            try (PreparedStatement statement = connection.prepareStatement("INSERT INTO rabbit(created_data) VALUES(?)")) {
-                statement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now().withNano(0)));
-                statement.execute();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (tableExists(connection, "rabbit")) {
+                try (PreparedStatement statement = connection.prepareStatement("INSERT INTO rabbit(created_data) VALUES(?)")) {
+                    statement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now().withNano(0)));
+                    statement.execute();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
+        }
+
+        private boolean tableExists(Connection connection, String tableName) throws SQLException {
+            DatabaseMetaData meta = connection.getMetaData();
+            ResultSet resultSet = meta.getTables(null, null, tableName, new String[]{"TABLE"});
+            return resultSet.next();
         }
     }
 }
