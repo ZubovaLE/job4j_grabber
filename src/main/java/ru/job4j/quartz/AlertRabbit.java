@@ -76,20 +76,28 @@ public class AlertRabbit {
         public void execute(JobExecutionContext context) {
             System.out.println("Rabbit runs here ...");
             Connection connection = (Connection) context.getJobDetail().getJobDataMap().get("DB");
-            if (tableExists(connection, "rabbit")) {
+            if (tableExists(connection)) {
                 try (PreparedStatement statement = connection.prepareStatement("INSERT INTO rabbit(created_data) VALUES(?)")) {
                     statement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now().withNano(0)));
                     statement.execute();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            } else {
+                LOGGER.error("Table doesn't exist");
             }
         }
 
-        private boolean tableExists(Connection connection, String tableName) throws SQLException {
-            DatabaseMetaData meta = connection.getMetaData();
-            ResultSet resultSet = meta.getTables(null, null, tableName, new String[]{"TABLE"});
-            return resultSet.next();
+        private boolean tableExists(Connection connection) {
+            boolean result = false;
+            try {
+                DatabaseMetaData meta = connection.getMetaData();
+                ResultSet resultSet = meta.getTables(null, null, "rabbit", new String[]{"TABLE"});
+                result = resultSet.next();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+            return result;
         }
     }
 }
