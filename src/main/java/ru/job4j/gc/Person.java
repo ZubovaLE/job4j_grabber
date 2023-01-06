@@ -15,11 +15,4 @@ public class Person {
     protected void finalize() throws Throwable {
         System.out.printf("Removed %d %s%n", age, name);
     }
-
-    public static void main(String[] args) {
-        Person person = new Person(1, "person");
-        System.out.println(person.getAge());
-        person.setAge(2);
-        System.out.println(person.getAge());
-    }
 }
