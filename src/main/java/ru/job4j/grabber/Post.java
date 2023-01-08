@@ -12,9 +12,6 @@ public class Post {
     private LocalDateTime created;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MMMM-EEEE-yyyy HH:mm:ss");
 
-    public Post() {
-    }
-
     public Post(String title, String link, String description, LocalDateTime created) {
         this.title = title;
         this.link = link;
