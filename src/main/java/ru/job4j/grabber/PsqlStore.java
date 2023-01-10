@@ -12,6 +12,13 @@ import java.util.Properties;
 
 public class PsqlStore implements Store, AutoCloseable {
     private final Connection connection;
+    private static volatile boolean tableExists = false;
+    private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS post(" +
+            "id SERIAL PRIMARY KEY," +
+            "name TEXT," +
+            "text TEXT," +
+            "link TEXT UNIQUE," +
+            "created TIMESTAMP);";
 
     public PsqlStore(Connection connection) {
         this.connection = connection;
@@ -39,36 +46,34 @@ public class PsqlStore implements Store, AutoCloseable {
 
     @Override
     public void save(Post post) {
-        if (tableExists(connection)) {
-            try (PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING;", Statement.RETURN_GENERATED_KEYS)) {
-                statement.setString(1, post.getTitle());
-                statement.setString(2, post.getDescription());
-                statement.setString(3, post.getLink());
-                statement.setTimestamp(4, Timestamp.valueOf(post.getCreated()));
-                statement.executeUpdate();
-                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        post.setId(generatedKeys.getInt(1));
-                    }
+        checkTable(connection);
+        try (PreparedStatement statement = connection.prepareStatement(
+                "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING;", Statement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, post.getTitle());
+            statement.setString(2, post.getDescription());
+            statement.setString(3, post.getLink());
+            statement.setTimestamp(4, Timestamp.valueOf(post.getCreated()));
+            statement.executeUpdate();
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    post.setId(generatedKeys.getInt(1));
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public List<Post> getAll() {
         List<Post> posts = new ArrayList<>();
-        if (tableExists(connection)) {
-            try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM post")) {
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    fillPosts(posts, resultSet);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
+        checkTable(connection);
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM post")) {
+            try (ResultSet resultSet = statement.executeQuery()) {
+                fillPosts(posts, resultSet);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return posts;
     }
@@ -87,24 +92,23 @@ public class PsqlStore implements Store, AutoCloseable {
     @Override
     public Post findById(int id) {
         Post result = null;
-        if (tableExists(connection)) {
-            try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM post WHERE id = ?")) {
-                statement.setInt(1, id);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                        result = new Post(
-                                resultSet.getInt("id"),
-                                resultSet.getString("name"),
-                                resultSet.getString("link"),
-                                resultSet.getString("text"),
-                                resultSet.getTimestamp("created").toLocalDateTime());
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
+        checkTable(connection);
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM post WHERE id = ?")) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    result = new Post(
+                            resultSet.getInt("id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("link"),
+                            resultSet.getString("text"),
+                            resultSet.getTimestamp("created").toLocalDateTime());
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return result;
     }
@@ -116,16 +120,27 @@ public class PsqlStore implements Store, AutoCloseable {
         }
     }
 
-    private boolean tableExists(Connection connection) {
-        boolean result = false;
-        try {
-            DatabaseMetaData metaData = connection.getMetaData();
-            ResultSet resultSet = metaData.getTables(null, null, "post", new String[]{"TABLE"});
-            result = resultSet.next();
-        } catch (SQLException se) {
-            se.printStackTrace();
+    private synchronized void checkTable(Connection connection) {
+        if (!tableExists) {
+            try {
+                DatabaseMetaData metaData = connection.getMetaData();
+                ResultSet resultSet = metaData.getTables(null, null, "post", new String[]{"TABLES"});
+                tableExists = resultSet.next();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-        return result;
+        if (!tableExists) {
+            createTable(connection);
+        }
+    }
+
+    private void createTable(Connection connection) {
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate(CREATE_TABLE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
