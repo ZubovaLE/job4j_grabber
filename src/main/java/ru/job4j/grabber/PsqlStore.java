@@ -1,6 +1,6 @@
 package ru.job4j.grabber;
 
-import ru.job4j.grabber.utils.HarbCareerDateTimeParser;
+import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,9 +13,7 @@ import java.util.Properties;
 public class PsqlStore implements Store, AutoCloseable {
     private final Connection connection;
     private static volatile boolean tableExists = false;
-    private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS post(" +
-            "id SERIAL PRIMARY KEY," +
-            "name TEXT," +
+    private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS post(id SERIAL PRIMARY KEY, name TEXT," +
             "text TEXT," +
             "link TEXT UNIQUE," +
             "created TIMESTAMP);";
@@ -126,12 +124,12 @@ public class PsqlStore implements Store, AutoCloseable {
                 DatabaseMetaData metaData = connection.getMetaData();
                 ResultSet resultSet = metaData.getTables(null, null, "post", new String[]{"TABLES"});
                 tableExists = resultSet.next();
+                if (!tableExists) {
+                    createTable(connection);
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }
-        if (!tableExists) {
-            createTable(connection);
         }
     }
 
@@ -145,7 +143,7 @@ public class PsqlStore implements Store, AutoCloseable {
 
     public static void main(String[] args) {
         Properties cfg = getProperties();
-        HabrCareerParse habrCareerParse = new HabrCareerParse(new HarbCareerDateTimeParser());
+        HabrCareerParse habrCareerParse = new HabrCareerParse(new HabrCareerDateTimeParser());
         try {
             PsqlStore psqlStore = new PsqlStore(cfg);
             List<Post> posts = habrCareerParse.list("https://career.habr.com/vacancies/java_developer?page=1");

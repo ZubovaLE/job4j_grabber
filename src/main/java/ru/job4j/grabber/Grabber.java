@@ -5,7 +5,7 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.job4j.grabber.utils.HarbCareerDateTimeParser;
+import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -119,7 +119,7 @@ public class Grabber implements Grab {
         grab.cfg();
         Scheduler scheduler = grab.scheduler();
         Store store = grab.store();
-        grab.init(new HabrCareerParse(new HarbCareerDateTimeParser()), store, scheduler);
+        grab.init(new HabrCareerParse(new HabrCareerDateTimeParser()), store, scheduler);
         grab.web(store);
     }
 }

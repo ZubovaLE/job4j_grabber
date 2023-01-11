@@ -20,9 +20,7 @@ import static org.quartz.SimpleScheduleBuilder.*;
 public class AlertRabbit {
     private static final Logger LOGGER = LoggerFactory.getLogger(AlertRabbit.class);
     private static volatile boolean tableExists = false;
-    private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS rabbit(" +
-            "id SERIAL PRIMARY KEY," +
-            "created_data TIMESTAMP);";
+    private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS rabbit(id SERIAL PRIMARY KEY, created_data TIMESTAMP);";
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         Optional<Properties> properties = getProperties();
@@ -96,12 +94,12 @@ public class AlertRabbit {
                 DatabaseMetaData meta = connection.getMetaData();
                 ResultSet resultSet = meta.getTables(null, null, "rabbit", new String[]{"TABLE"});
                 tableExists = resultSet.next();
+                if (!tableExists) {
+                    createTable(connection);
+                }
             } catch (SQLException se) {
                 se.printStackTrace();
             }
-        }
-        if (!tableExists) {
-            createTable(connection);
         }
     }
 
