@@ -1,12 +1,13 @@
 package ru.job4j.grabber;
 
+import org.apache.commons.lang3.Validate;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import ru.job4j.grabber.utils.DateTimeParser;
-import ru.job4j.grabber.utils.HarbCareerDateTimeParser;
+import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -18,7 +19,6 @@ public class HabrCareerParse implements Parse {
     private static final String SOURCE_LINK = "https://career.habr.com";
     private static final String PAGE_LINK = String.format("%s/vacancies/java_developer?page=", SOURCE_LINK);
     private final DateTimeParser dateTimeParser;
-
     private int id = 0;
 
     public HabrCareerParse(DateTimeParser dateTimeParser) {
@@ -26,7 +26,7 @@ public class HabrCareerParse implements Parse {
     }
 
     public static void main(String[] args) {
-        HabrCareerParse habrCareerParse = new HabrCareerParse(new HarbCareerDateTimeParser());
+        HabrCareerParse habrCareerParse = new HabrCareerParse(new HabrCareerDateTimeParser());
         List<Post> posts = habrCareerParse.list(PAGE_LINK);
         posts.forEach(System.out::println);
     }
@@ -48,6 +48,7 @@ public class HabrCareerParse implements Parse {
     public List<Post> list(String link) {
         List<Post> posts = new ArrayList<>();
         Connection connection;
+        //проверка pagination
         for (int i = 1; i <= 5; i++) {
             connection = Jsoup.connect(link + i);
             fillPosts(connection, posts);
@@ -63,12 +64,13 @@ public class HabrCareerParse implements Parse {
                 Element titleElement = row.select(".vacancy-card__title").first();
                 Element linkElement = Objects.requireNonNull(titleElement).child(0);
                 Element dateElement = row.select(".vacancy-card__date").first();
+                Validate.isTrue( Objects.requireNonNull(dateElement).childrenSize() == 1, "vacancy-card__date must have only one child");
                 Element dateTime = Objects.requireNonNull(dateElement).child(0);
                 String vacancyName = titleElement.text();
                 String vacancyLink = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
                 String description = retrieveDescription(vacancyLink);
-                String date = dateTime.attr("datetime");
-                LocalDateTime time = dateTimeParser.parse(date);
+                String datetime = dateTime.attr("datetime");
+                LocalDateTime time = dateTimeParser.parse(datetime);
                 posts.add(new Post(id++, vacancyName, vacancyLink, description, time));
             });
         } catch (IOException e) {
