@@ -15,20 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class HabrCareerParse implements Parse {
     private static final String SOURCE_LINK = "https://career.habr.com";
     private static final String PAGE_LINK = String.format("%s/vacancies/java_developer?page=", SOURCE_LINK);
     private final DateTimeParser dateTimeParser;
     private int id = 0;
+    private String href;
 
     public HabrCareerParse(DateTimeParser dateTimeParser) {
         this.dateTimeParser = dateTimeParser;
-    }
-
-    public static void main(String[] args) {
-        HabrCareerParse habrCareerParse = new HabrCareerParse(new HabrCareerDateTimeParser());
-        List<Post> posts = habrCareerParse.list(PAGE_LINK);
-        posts.forEach(System.out::println);
     }
 
     private String retrieveDescription(String link) {
@@ -41,7 +38,6 @@ public class HabrCareerParse implements Parse {
             e.printStackTrace();
         }
         return description;
-
     }
 
     @Override
@@ -64,17 +60,26 @@ public class HabrCareerParse implements Parse {
                 Element titleElement = row.select(".vacancy-card__title").first();
                 Element linkElement = Objects.requireNonNull(titleElement).child(0);
                 Element dateElement = row.select(".vacancy-card__date").first();
-                Validate.isTrue( Objects.requireNonNull(dateElement).childrenSize() == 1, "vacancy-card__date must have only one child");
+                Validate.isTrue(Objects.requireNonNull(dateElement).childrenSize() == 1, "vacancy-card__date must have only one child");
                 Element dateTime = Objects.requireNonNull(dateElement).child(0);
                 String vacancyName = titleElement.text();
-                String vacancyLink = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
-                String description = retrieveDescription(vacancyLink);
-                String datetime = dateTime.attr("datetime");
-                LocalDateTime time = dateTimeParser.parse(datetime);
-                posts.add(new Post(id++, vacancyName, vacancyLink, description, time));
+                href = linkElement.attr("href");
+                if (isNotBlank(href)) {
+                    String vacancyLink = String.format("%s%s", SOURCE_LINK, href);
+                    String description = retrieveDescription(vacancyLink);
+                    String datetime = dateTime.attr("datetime");
+                    LocalDateTime time = dateTimeParser.parse(datetime);
+                    posts.add(new Post(id++, vacancyName, vacancyLink, description, time));
+                }
             });
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        HabrCareerParse habrCareerParse = new HabrCareerParse(new HabrCareerDateTimeParser());
+        List<Post> posts = habrCareerParse.list(PAGE_LINK);
+        posts.forEach(System.out::println);
     }
 }
