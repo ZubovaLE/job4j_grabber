@@ -43,11 +43,18 @@ public class HabrCareerParse implements Parse {
     @Override
     public List<Post> list(String link) {
         List<Post> posts = new ArrayList<>();
-        Connection connection;
-        //проверка pagination
-        for (int i = 1; i <= 5; i++) {
-            connection = Jsoup.connect(link + i);
-            fillPosts(connection, posts);
+        Connection connection = Jsoup.connect(SOURCE_LINK);
+        Document document;
+        try {
+            document = connection.get();
+            Element pages = document.select(".with-pagination__pages").first();
+            Validate.isTrue(Objects.requireNonNull(pages).childrenSize() > 5, "There are not enough pages");
+            for (int i = 1; i <= 5; i++) {
+                connection = Jsoup.connect(link + i);
+                fillPosts(connection, posts);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return posts;
     }
