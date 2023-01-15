@@ -1,6 +1,7 @@
 package ru.job4j.grabber;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,6 +11,7 @@ import ru.job4j.grabber.utils.DateTimeParser;
 import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +20,11 @@ import java.util.Objects;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class HabrCareerParse implements Parse {
-    private static final String SOURCE_LINK = "https://career.habr.com";
-    private static final String PAGE_LINK = String.format("%s/vacancies/java_developer?page=", SOURCE_LINK);
+    private static final URIBuilder SOURCE_LINK = new URIBuilder().setScheme("https").setHost("career.habr.com");
+    private static final String PAGE_LINK = SOURCE_LINK.setPath("vacancies/java_developer").toString();
     private final DateTimeParser dateTimeParser;
-    private int id = 0;
     private String href;
+    private int startingId;
 
     public HabrCareerParse(DateTimeParser dateTimeParser) {
         this.dateTimeParser = dateTimeParser;
@@ -43,17 +45,16 @@ public class HabrCareerParse implements Parse {
     @Override
     public List<Post> list(String link) {
         List<Post> posts = new ArrayList<>();
-        Connection connection = Jsoup.connect(SOURCE_LINK);
-        Document document;
+        Connection connection;
+        URIBuilder uriBuilder;
+        String URIBuilderParameter = "page";
         try {
-            document = connection.get();
-            Element pages = document.select(".with-pagination__pages").first();
-            Validate.isTrue(Objects.requireNonNull(pages).childrenSize() > 5, "There are not enough pages");
+            uriBuilder = new URIBuilder(link);
             for (int i = 1; i <= 5; i++) {
-                connection = Jsoup.connect(link + i);
+                connection = Jsoup.connect(uriBuilder.setParameter(URIBuilderParameter, String.valueOf(i)).toString());
                 fillPosts(connection, posts);
             }
-        } catch (IOException e) {
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         return posts;
@@ -63,6 +64,7 @@ public class HabrCareerParse implements Parse {
         try {
             Document document = connection.get();
             Elements rows = document.select(".vacancy-card__inner");
+            startingId = posts.size();
             rows.forEach(row -> {
                 Element titleElement = row.select(".vacancy-card__title").first();
                 Element linkElement = Objects.requireNonNull(titleElement).child(0);
@@ -72,11 +74,11 @@ public class HabrCareerParse implements Parse {
                 String vacancyName = titleElement.text();
                 href = linkElement.attr("href");
                 if (isNotBlank(href)) {
-                    String vacancyLink = String.format("%s%s", SOURCE_LINK, href);
+                    String vacancyLink = SOURCE_LINK.setPath(href).toString();
                     String description = retrieveDescription(vacancyLink);
                     String datetime = dateTime.attr("datetime");
                     LocalDateTime time = dateTimeParser.parse(datetime);
-                    posts.add(new Post(id++, vacancyName, vacancyLink, description, time));
+                    posts.add(new Post(++startingId, vacancyName, vacancyLink, description, time));
                 }
             });
         } catch (IOException e) {
