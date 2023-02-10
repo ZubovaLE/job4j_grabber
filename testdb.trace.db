@@ -415,3 +415,6 @@ INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) ON CONFLICT(link
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Синтаксическая ошибка в выражении SQL "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) [*]ON CONFLICT(link) DO NOTHING;"
 Syntax error in SQL statement "INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) [*]ON CONFLICT(link) DO NOTHING;"; SQL statement:
 INSERT INTO post(name, text, link, created) VALUES (?, ?, ?, ?) ON CONFLICT(link) DO NOTHING; [42000-214]
+2023-01-13 22:50:03 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DATABASECHANGELOGLOCK" not found (this database is empty); SQL statement:
+SELECT COUNT(*) FROM DATABASECHANGELOGLOCK [42104-214]
