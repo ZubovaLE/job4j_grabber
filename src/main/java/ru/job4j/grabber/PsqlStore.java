@@ -44,17 +44,12 @@ public class PsqlStore implements Store, AutoCloseable {
     public void save(Post post) {
         checkTable(connection);
         try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO post(title, link, description, created) VALUES (?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)) {
+                "INSERT INTO post(title, link, description, created) VALUES (?, ?, ?, ?) RETURNING id;")) {
             statement.setString(1, post.getTitle());
             statement.setString(2, post.getLink());
             statement.setString(3, post.getDescription());
             statement.setTimestamp(4, Timestamp.valueOf(post.getCreated()));
-            statement.executeUpdate();
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    post.setId(generatedKeys.getInt(1));
-                }
-            }
+            post.setId(statement.executeQuery().getInt(1));
         } catch (SQLException e) {
             e.printStackTrace();
         }
