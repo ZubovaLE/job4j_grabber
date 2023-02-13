@@ -6,15 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
-public class PsqlStore implements Store, AutoCloseable {
+public class PsqlStore implements Store<Post>, AutoCloseable {
     private final Connection connection;
-    private static volatile boolean tableExists = false;
-    private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS post(id SERIAL PRIMARY KEY, title TEXT," +
-            "link TEXT NOT NULL UNIQUE, description TEXT, created TIMESTAMP);";
+    private volatile boolean tableExists = false;
+    private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS post(id SERIAL PRIMARY KEY, title TEXT,link TEXT NOT NULL UNIQUE, description TEXT, created TIMESTAMP);";
+    private static final String GET_ALL_LINKS = "SELECT link FROM post";
+    private static final String PROPERTIES_NAME = "app.properties";
 
     public PsqlStore(Connection connection) {
         this.connection = connection;
@@ -23,16 +22,15 @@ public class PsqlStore implements Store, AutoCloseable {
     public PsqlStore(Properties cfg) throws SQLException {
         try {
             Class.forName(cfg.getProperty("driver"));
+            connection = DriverManager.getConnection(cfg.getProperty("url"), cfg.getProperty("username"), cfg.getProperty("password"));
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
-        connection = DriverManager.getConnection(cfg.getProperty("url"), cfg.getProperty("username"),
-                cfg.getProperty("password"));
     }
 
     private static Properties getProperties() {
         Properties config = new Properties();
-        try (InputStream is = PsqlStore.class.getClassLoader().getResourceAsStream("app.properties")) {
+        try (InputStream is = PsqlStore.class.getClassLoader().getResourceAsStream(PROPERTIES_NAME)) {
             config.load(is);
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,7 +47,10 @@ public class PsqlStore implements Store, AutoCloseable {
             statement.setString(2, post.getLink());
             statement.setString(3, post.getDescription());
             statement.setTimestamp(4, Timestamp.valueOf(post.getCreated()));
-            post.setId(statement.executeQuery().getInt(1));
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                post.setId(resultSet.getInt(1));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -105,6 +106,20 @@ public class PsqlStore implements Store, AutoCloseable {
     }
 
     @Override
+    public List<String> getAllLinks() {
+        List<String> addedLinks = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(GET_ALL_LINKS)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                addedLinks.add(resultSet.getString("link"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return addedLinks;
+    }
+
+    @Override
     public void close() throws Exception {
         if (connection != null) {
             connection.close();
@@ -140,7 +155,12 @@ public class PsqlStore implements Store, AutoCloseable {
         try {
             PsqlStore psqlStore = new PsqlStore(cfg);
             List<Post> posts = habrCareerParse.list("https://career.habr.com/vacancies/java_developer?page=1");
-            posts.forEach(psqlStore::save);
+            Set<String> linksFromDB = new HashSet<>(psqlStore.getAllLinks());
+            if (!posts.isEmpty()) {
+                posts.stream()
+                        .filter(p -> !linksFromDB.contains(p.getLink()))
+                        .forEach(psqlStore::save);
+            }
             System.out.println(psqlStore.findById(1));
         } catch (SQLException e) {
             e.printStackTrace();

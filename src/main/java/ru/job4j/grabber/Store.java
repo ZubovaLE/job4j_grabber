@@ -2,10 +2,12 @@ package ru.job4j.grabber;
 
 import java.util.List;
 
-public interface Store {
-    void save(Post post);
+public interface Store<E> {
+    void save(E e);
 
-    List<Post> getAll();
+    List<E> getAll();
 
-    Post findById(int id);
+    E findById(int id);
+
+    List<String> getAllLinks();
 }

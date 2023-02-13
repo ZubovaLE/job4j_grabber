@@ -24,14 +24,14 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
-public class Grabber implements Grab {
+public class Grabber implements Grab<Post> {
     private final Properties cfg = new Properties();
     private static final Logger LOGGER = LoggerFactory.getLogger(Grabber.class.getName());
     private static final String SOURCE_LINK = "https://career.habr.com";
     private static final String PAGE_LINK = String.format("%s/vacancies/java_developer?page=", SOURCE_LINK);
     private static final String LINE_SEPARATOR = System.lineSeparator();
 
-    public Store store() throws SQLException {
+    public Store<Post> store() throws SQLException {
         return new PsqlStore(cfg);
     }
 
@@ -47,7 +47,7 @@ public class Grabber implements Grab {
         }
     }
 
-    public void web(Store store) {
+    public void web(Store<Post> store) {
         try (ServerSocket server = new ServerSocket(Integer.parseInt(cfg.getProperty("port")))) {
             while (!server.isClosed()) {
                 Socket socket = server.accept();
@@ -75,7 +75,7 @@ public class Grabber implements Grab {
     }
 
     @Override
-    public void init(Parse parse, Store store, Scheduler scheduler) throws SchedulerException {
+    public void init(Parse parse, Store<Post> store, Scheduler scheduler) throws SchedulerException {
         JobDataMap data = new JobDataMap();
         data.put("store", store);
         data.put("parse", parse);
@@ -98,7 +98,7 @@ public class Grabber implements Grab {
         public void execute(JobExecutionContext jobExecutionContext) {
             LOGGER.info("Started finding new posts");
             JobDataMap map = jobExecutionContext.getJobDetail().getJobDataMap();
-            Store store = (Store) map.get("store");
+            Store<Post> store = (Store<Post>) map.get("store");
             Parse parse = (Parse) map.get("parse");
             List<Post> posts;
             try {
@@ -118,7 +118,7 @@ public class Grabber implements Grab {
         Grabber grab = new Grabber();
         grab.cfg();
         Scheduler scheduler = grab.scheduler();
-        Store store = grab.store();
+        Store<Post> store = grab.store();
         grab.init(new HabrCareerParse(new HabrCareerDateTimeParser()), store, scheduler);
         grab.web(store);
     }
