@@ -38,10 +38,6 @@ public class Post {
 
     @Override
     public String toString() {
-        return "Post{title='" + title + '\'' +
-                ", link='" + link + '\'' +
-                ", description='" + description + '\'' +
-                ", created=" + FORMATTER.format(created) +
-                '}';
+        return String.format("%s%n%s%n%s%n%s%n%n", title, FORMATTER.format(created), link, description);
     }
 }
