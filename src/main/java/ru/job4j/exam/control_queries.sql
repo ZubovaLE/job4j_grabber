@@ -17,13 +17,16 @@ insert into person (id, name, company_id) values (1, 'Person 1', 1), (2, 'Person
 
 insert into person (id, name, company_id) values (12, 'Person 12', 2), (13, 'Person 13', 3);
 
-select * from person where company_id != 5;
+--select the names of all persons who are not in the company with id = 5;
+select name from person where company_id != 5;
 
+--select a company name for each person
 select p.name as person, c.name as company
 from person as p
 join company as c
 on p.company_id = c.id;
 
+--select the company name with the maximum number of people + number of people in this company
 select c.name as company, count(p.id) as count_of_people
 from company as c
 join person as p

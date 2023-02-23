@@ -2,8 +2,6 @@ package ru.job4j.gc;
 
 import lombok.*;
 
-import static java.lang.Runtime.getRuntime;
-
 @Getter
 @Setter
 @AllArgsConstructor

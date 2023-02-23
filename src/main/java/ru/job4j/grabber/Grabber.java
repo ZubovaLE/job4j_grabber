@@ -96,7 +96,7 @@ public class Grabber implements Grab<Post> {
             Set<String> linksFromDB = new HashSet<>(store.getAllLinks());
             try {
                 posts = parse.list(link).stream()
-                        .filter(p -> StringUtils.containsIgnoreCase(p.getTitle(), "java") && !linksFromDB.contains(p))
+                        .filter(p -> !linksFromDB.contains(p.getLink()) && StringUtils.containsIgnoreCase(p.getTitle(), "java"))
                         .collect(Collectors.toList());
                 posts.forEach(store::save);
                 LOGGER.info("Finished finding new posts");
