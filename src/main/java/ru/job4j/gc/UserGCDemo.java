@@ -1,16 +1,22 @@
 package ru.job4j.gc;
 
 public class UserGCDemo {
+    private static final Runtime ENVIRONMENT = Runtime.getRuntime();
+
+    public static void info() {
+        final long freeMemory = ENVIRONMENT.freeMemory();
+        final long totalMemory = ENVIRONMENT.totalMemory();
+        System.out.printf("Free: %d%n", freeMemory);
+        System.out.printf("Total: %d%n", totalMemory);
+    }
 
     public static void main(String[] args) {
-        Runtime environment = Runtime.getRuntime();
-        System.out.println("Total memory: " + environment.totalMemory());
-        System.out.println("Free memory: " + environment.freeMemory());
+        System.out.println("Before creating objects:");
+        info();
         for (int i = 0; i < 10; i++) {
-            new User();
+            new User(i, "User", 18);
         }
-        System.gc();
-        System.out.println("Total memory: " + environment.totalMemory());
-        System.out.println("Free memory: " + environment.freeMemory());
+        System.out.println("After creating objects:");
+        info();
     }
 }

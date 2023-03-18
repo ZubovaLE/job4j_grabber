@@ -12,7 +12,7 @@ public class User {
     private int age;
 
     @Override
-    protected void finalize() throws Throwable {
+    protected void finalize() {
         System.out.printf("Removed %d%n", passport);
     }
 }
