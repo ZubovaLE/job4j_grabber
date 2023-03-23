@@ -1,67 +1,73 @@
 package ru.job4j.tdd;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.*;
 
 class CinemaTest {
+    private Account account;
+    private Cinema cinema;
+    private Calendar date;
 
-    @Test
-    @DisplayName("Test buy")
-    void whenBuy() {
+    @BeforeEach
+    public void initData() {
         Account account = new AccountCinema();
         Cinema cinema = new Cinema3D();
         Calendar date = Calendar.getInstance();
         date.set(2020, Calendar.NOVEMBER, 10, 23, 0);
-        Ticket ticket = cinema.buy(account, 1, 1, date);
-        assertThat(ticket, is(new Ticket3D()));
     }
 
     @Test
-    @DisplayName("Test buy when is already bought then null")
-    void buyWhenAlreadyBoughtThenNull() {
-        Account account = new AccountCinema();
-        Cinema cinema = new Cinema3D();
-        Calendar date = Calendar.getInstance();
-        date.set(2020, Calendar.NOVEMBER, 10, 23, 0);
+    @DisplayName("When correct buy then return ticket")
+    void whenBuySuccessfully() {
+        Ticket ticket = cinema.buy(account, 1, 1, date);
+        assertThat(ticket).isEqualTo(new Ticket3D());
+    }
+
+    @Test
+    @DisplayName("Test buy when already bought then exception")
+    void buyWhenAlreadyBoughtThenException() {
         Ticket ticketOne = cinema.buy(account, 1, 1, date);
-        Ticket ticketTwo = cinema.buy(account, 1, 1, date);
-        assertThat(ticketOne, is(new Ticket3D()));
-        assertNull(ticketTwo);
+        assertThat(ticketOne).isEqualTo(new Ticket3D());
+        assertThatIllegalArgumentException().isThrownBy(() ->  cinema.buy(account, 1, 1, date));
     }
 
     @Test
-    @DisplayName("Test buy when no tickets then null")
-    void buyWhenNoTicketsThenNull() {
-        Account account = new AccountCinema();
-        Cinema cinema = new Cinema3D();
-        Calendar date = Calendar.getInstance();
-        date.set(2020, Calendar.NOVEMBER, 10, 23, 0);
-        Ticket ticket = cinema.buy(account, 1, 1, date);
-        assertNull(ticket);
+    @DisplayName("Buy when incorrect date then exception")
+    void buyWhenIncorrectDateThenException() {
+        assertThatIllegalArgumentException().isThrownBy(() -> cinema.buy(account, 1, 1, date));
     }
-    
+
     @Test
-    @DisplayName("Test find")
+    @DisplayName("Buy when incorrect row then exception")
+    void buyWhenIncorrectRowThenException() {
+        assertThatIllegalArgumentException().isThrownBy(() -> cinema.buy(account, 1, 1, date));
+    }
+
+    @Test
+    @DisplayName("Buy when incorrect row then exception")
+    void buyWhenIncorrectColumnThenException() {
+        assertThatIllegalArgumentException().isThrownBy(() -> cinema.buy(account, 1, 1, date));
+    }
+
+    @Test
+    @DisplayName("When correct find then return list")
     void whenFind() {
-        Cinema cinema = new Cinema3D();
         cinema.add(new Session3D());
         List<Session> sessions = cinema.find(session -> true);
-        assertThat(sessions, is(List.of(new Session3D())));
+        assertThat(sessions).isEqualTo(List.of(new Session3D()));
     }
 
     @Test
-    @DisplayName("Test find when no sessions")
-    public void whenNotSession() {
-        Cinema cinema = new Cinema3D();
+    @DisplayName("Test find when no sessions then return empty list")
+    public void whenNoSessionsThenEmptyList() {
         cinema.add(new Session3D());
         List<Session> sessions = cinema.find(session -> false);
-        assertThat(sessions.size(), is(0));
+        assertThat(sessions).hasSize(0);
     }
 }
