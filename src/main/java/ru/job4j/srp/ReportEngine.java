@@ -12,12 +12,18 @@ public class ReportEngine implements Report {
     @Override
     public String generate(Predicate<Employee> filter) {
         StringBuilder text = new StringBuilder();
-        text.append("Name; Hired; Fired; Salary").append(SEPARATOR);
+        text.append("<!DOCTYPE HTML><html><head>")
+                .append("<title>HTML отчёт.</title></head>")
+                .append("<body><table>")
+                .append("<tr><th>Name</th><th>Hired</th>")
+                .append("<th>Fired</th><th>Salary</th></tr>");
         for (Employee employee : store.findBy(filter)) {
-            text.append(employee.getName()).append(";")
-                    .append(employee.getHired()).append(";")
-                    .append(employee.getFired()).append(";")
-                    .append(employee.getSalary()).append(";")
+            text.append("<tr><td>")
+                    .append(employee.getName()).append("</td>").append("<td>")
+                    .append(employee.getFired()).append("</td>").append("<td>")
+                    .append(employee.getHired()).append("</td>").append("<td>")
+                    .append(employee.getSalary()).append("</td></tr>")
+                    .append("</table></body></html>")
                     .append(SEPARATOR);
         }
         return text.toString();
