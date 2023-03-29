@@ -19,17 +19,23 @@ public class HTMLReport implements Report {
                 .append("<title>HTML отчёт</title>").append(SEPARATOR)
                 .append("</head>").append(SEPARATOR)
                 .append("<body>").append(SEPARATOR)
-                .append("<table>")
-                .append("<tr><th>Name</th><th>Hired</th>")
-                .append("<th>Fired</th><th>Salary</th></tr>");
+                .append("<table>").append(SEPARATOR)
+                .append("<tr>").append(SEPARATOR)
+                .append("<th>Name</th>").append(SEPARATOR)
+                .append("<th>Hired</th>").append(SEPARATOR)
+                .append("<th>Fired</th>").append(SEPARATOR)
+                .append("<th>Salary</th>").append(SEPARATOR)
+                .append("</tr>").append(SEPARATOR);
         for (Employee employee : store.findBy(filter)) {
-            text.append("<tr><td>")
-                    .append(employee.getName()).append("</td>").append("<td>")
-                    .append(employee.getFired()).append("</td>").append("<td>")
-                    .append(employee.getHired()).append("</td>").append("<td>")
-                    .append(employee.getSalary()).append("</td></tr>")
-                    .append("</table></body></html>")
-                    .append(SEPARATOR);
+            text.append("<tr><").append(SEPARATOR)
+                    .append("td>").append(employee.getName()).append("</td>").append(SEPARATOR)
+                    .append("<td>").append(employee.getFired()).append("</td>").append(SEPARATOR)
+                    .append("<td>").append(employee.getHired()).append("</td>").append(SEPARATOR)
+                    .append("<td>").append(employee.getSalary()).append("</td>").append(SEPARATOR)
+                    .append("</tr>").append(SEPARATOR)
+                    .append("</table>").append(SEPARATOR)
+                    .append("</body>").append(SEPARATOR)
+                    .append("</html>").append(SEPARATOR);
         }
         return text.toString();
     }

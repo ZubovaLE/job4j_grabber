@@ -24,15 +24,22 @@ class HTMLReportTest {
                 .append("<title>HTML отчёт</title>").append(SEPARATOR)
                 .append("</head>").append(SEPARATOR)
                 .append("<body>").append(SEPARATOR)
-                .append("<table>")
-                .append("<tr><th>Name</th><th>Hired</th>")
-                .append("<th>Fired</th><th>Salary</th></tr>")
-                .append("<tr><td>").append(worker.getName()).append("</td>")
-                .append("<td>").append(worker.getFired()).append("</td>")
-                .append("<td>").append(worker.getHired()).append("</td>")
-                .append("<td>").append(worker.getSalary()).append("</td></tr>")
-                .append("</table></body></html>")
-                .append(System.lineSeparator());
+                .append("<table>").append(SEPARATOR)
+                .append("<tr>").append(SEPARATOR)
+                .append("<th>Name</th>").append(SEPARATOR)
+                .append("<th>Hired</th>").append(SEPARATOR)
+                .append("<th>Fired</th>").append(SEPARATOR)
+                .append("<th>Salary</th>").append(SEPARATOR)
+                .append("</tr>").append(SEPARATOR)
+                .append("<tr><").append(SEPARATOR)
+                .append("td>").append(worker.getName()).append("</td>").append(SEPARATOR)
+                .append("<td>").append(worker.getFired()).append("</td>").append(SEPARATOR)
+                .append("<td>").append(worker.getHired()).append("</td>").append(SEPARATOR)
+                .append("<td>").append(worker.getSalary()).append("</td>").append(SEPARATOR)
+                .append("</tr>").append(SEPARATOR)
+                .append("</table>").append(SEPARATOR)
+                .append("</body>").append(SEPARATOR)
+                .append("</html>").append(SEPARATOR);
         assertEquals(expected.toString(), htmlReport.generate(em -> true));
     }
 }
