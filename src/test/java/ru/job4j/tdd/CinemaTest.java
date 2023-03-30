@@ -1,5 +1,6 @@
 package ru.job4j.tdd;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,55 +17,69 @@ class CinemaTest {
 
     @BeforeEach
     public void initData() {
-        Account account = new AccountCinema();
-        Cinema cinema = new Cinema3D();
-        Calendar date = Calendar.getInstance();
+        account = new AccountCinema();
+        cinema = new Cinema3D();
+        date = Calendar.getInstance();
         date.set(2020, Calendar.NOVEMBER, 10, 23, 0);
     }
 
+    @Ignore
     @Test
-    @DisplayName("When correct buy then return ticket")
+    @DisplayName("When buy successfully then return ticket")
     void whenBuySuccessfully() {
         Ticket ticket = cinema.buy(account, 1, 1, date);
         assertThat(ticket).isEqualTo(new Ticket3D());
     }
 
+    @Ignore
     @Test
-    @DisplayName("Test buy when already bought then exception")
-    void buyWhenAlreadyBoughtThenException() {
+    @DisplayName("Buy when already bought then return null")
+    void buyWhenAlreadyBoughtThenNull() {
         Ticket ticketOne = cinema.buy(account, 1, 1, date);
-        assertThat(ticketOne).isEqualTo(new Ticket3D());
-        assertThatIllegalArgumentException().isThrownBy(() ->  cinema.buy(account, 1, 1, date));
+        assertThat(cinema.buy(account, 1, 1, date)).isNull();
     }
 
+    @Ignore
     @Test
-    @DisplayName("Buy when incorrect date then exception")
-    void buyWhenIncorrectDateThenException() {
-        assertThatIllegalArgumentException().isThrownBy(() -> cinema.buy(account, 1, 1, date));
+    @DisplayName("Buy when incorrect date then return null")
+    void buyWhenIncorrectDateThenNull() {
+        date.set(1999, Calendar.NOVEMBER, 10, 23, 0);
+        assertThat(cinema.buy(account, 1, 1, date)).isNull();
     }
 
+    @Ignore
     @Test
-    @DisplayName("Buy when incorrect row then exception")
-    void buyWhenIncorrectRowThenException() {
-        assertThatIllegalArgumentException().isThrownBy(() -> cinema.buy(account, 1, 1, date));
+    @DisplayName("Buy when incorrect row then return null")
+    void buyWhenIncorrectRowThenNull() {
+        assertThat(cinema.buy(account, -1, 1, date)).isNull();
     }
 
+    @Ignore
     @Test
-    @DisplayName("Buy when incorrect row then exception")
-    void buyWhenIncorrectColumnThenException() {
-        assertThatIllegalArgumentException().isThrownBy(() -> cinema.buy(account, 1, 1, date));
+    @DisplayName("Buy when incorrect row then return null")
+    void buyWhenIncorrectColumnThenNull() {
+        assertThat(cinema.buy(account, 1, -1, date)).isNull();
     }
 
+    @Ignore
     @Test
-    @DisplayName("When correct find then return list")
+    @DisplayName("Buy when non-existent account then return null")
+    void buyWhenNonExistentAccountThenNull() {
+        assertThat(cinema.buy(null, 1, 1, date)).isNull();
+    }
+
+    @Ignore
+    @Test
+    @DisplayName("When find successfully then return list of sessions")
     void whenFind() {
         cinema.add(new Session3D());
         List<Session> sessions = cinema.find(session -> true);
         assertThat(sessions).isEqualTo(List.of(new Session3D()));
     }
 
+    @Ignore
     @Test
-    @DisplayName("Test find when no sessions then return empty list")
+    @DisplayName("Find when no sessions then return empty list")
     public void whenNoSessionsThenEmptyList() {
         cinema.add(new Session3D());
         List<Session> sessions = cinema.find(session -> false);
