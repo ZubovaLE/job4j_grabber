@@ -1,7 +1,6 @@
 package ru.job4j.cache;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Scanner;
 
@@ -9,8 +8,15 @@ public class Emulator {
     private final static String SEPARATOR = System.lineSeparator();
     private final static List<String> menuOptions = List.of(
             "Specify directory", "Load file content into cache", "Get file content from cache", "Exit");
-    private static String menuContent;
     private final static Scanner ANSWERS_SCANNER = new Scanner(System.in);
+    private static String menuContent;
+
+    public static void main(String[] args) {
+        File current = new File("C:/projects/job4j_grabber/src/main/java/ru.jo4j/cache/data");
+        DirFileCache dirFileCache = new DirFileCache(current.getAbsolutePath());
+        Emulator emulator = new Emulator();
+        emulator.init(dirFileCache);
+    }
 
     public void init(DirFileCache dirFileCache) {
         int select;
@@ -72,11 +78,5 @@ public class Emulator {
         return answer;
     }
 
-    public static void main(String[] args) {
-        File current = new File("");
-        DirFileCache dirFileCache = new DirFileCache(current.getAbsolutePath());
-        Emulator emulator = new Emulator();
-        emulator.init(dirFileCache);
 
-    }
 }

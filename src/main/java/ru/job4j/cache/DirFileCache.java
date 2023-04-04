@@ -14,7 +14,7 @@ public class DirFileCache extends AbstractCache<String, String> {
     @Override
     protected String load(String key) {
         try {
-            return Files.readString(Paths.get(cachingDir + key));
+            return Files.readString(Paths.get(cachingDir + "/" + key));
         } catch (IOException e) {
             System.out.printf("File \"%s\" is not found%n", key);
         }
