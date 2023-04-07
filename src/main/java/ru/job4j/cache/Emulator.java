@@ -12,8 +12,7 @@ public class Emulator {
     private static String menuContent;
 
     public static void main(String[] args) {
-        File current = new File("C:/projects/job4j_grabber/src/main/java/ru.jo4j/cache/data");
-        DirFileCache dirFileCache = new DirFileCache(current.getAbsolutePath());
+        DirFileCache dirFileCache = new DirFileCache(new File(System.getProperty("user.dir") + "\\src\\main\\java\\ru\\job4j\\cache\\data").getAbsolutePath());
         Emulator emulator = new Emulator();
         emulator.init(dirFileCache);
     }
@@ -37,14 +36,14 @@ public class Emulator {
                     System.out.print("Write file name: ");
                     String fileName = ANSWERS_SCANNER.nextLine();
                     if (dirFileCache != null) {
-                        dirFileCache.load(fileName);
+                       dirFileCache.load(fileName);
                     }
                     break;
                 case 3:
                     System.out.print("Write file name: ");
                     String key = ANSWERS_SCANNER.nextLine();
                     if (dirFileCache != null) {
-                        dirFileCache.get(key);
+                        System.out.println(dirFileCache.get(key));
                     }
                     break;
                 case 4:
