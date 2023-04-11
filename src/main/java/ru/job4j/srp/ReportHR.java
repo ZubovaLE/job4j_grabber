@@ -24,6 +24,5 @@ public class ReportHR implements Report {
                     .append(System.lineSeparator());
         }
         return text.toString();
-
     }
 }
