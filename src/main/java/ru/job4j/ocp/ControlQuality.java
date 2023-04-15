@@ -5,24 +5,37 @@ import ru.job4j.ocp.storage.Shop;
 import ru.job4j.ocp.storage.Trash;
 import ru.job4j.ocp.storage.Warehouse;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.*;
 import java.util.List;
-import java.util.function.Predicate;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ControlQuality {
-    private final Trash trash = new Trash();
-    private final Warehouse warehouse = new Warehouse();
-    private final Shop shop = new Shop();
+    private final List<Shipment> shipments;
 
-    private List<Shipment> shipments = List.of(
-            new WarehouseShipment(f -> true),
-            new ShopShipmentWithoutDiscount(f -> true),
-            new DiscountShopShipment(f -> true),
-            new TrashShipment(f -> true)
-    );
-    
-//    Predicate<Food> predicate = f -> (Duration.between(f.getExpiryDate(), LocalDate.now()))/(Duration.between(f.getExpiryDate(), f.getCreateDate())) * 100 < 25;
+    public ControlQuality(Shop shop, Warehouse warehouse, Trash trash) {
+        shipments = List.of(
+                new TrashShipment(trash, food -> (food.getExpiryDate().isBefore(LocalDate.now()))),
+                new WarehouseShipment(warehouse, food -> food.getExpiryDate().isAfter(LocalDate.now()) &&
+                        calculateExpiryDatePercentage(LocalDate.now(), food.getCreateDate(), food.getExpiryDate()) < 25),
+                new ShopShipmentWithoutDiscount(shop, food ->
+                {
+                    long duration = calculateExpiryDatePercentage(LocalDate.now(), food.getCreateDate(), food.getExpiryDate());
+                    return duration >= 25 && duration <= 75;
+                }),
+                new DiscountShopShipment(shop, food -> calculateExpiryDatePercentage(LocalDate.now(), food.getCreateDate(), food.getExpiryDate()) > 75));
+    }
+
+    public void sendFoodToCorrectStorage(Food food) {
+        for (Shipment shipment : shipments) {
+            if (shipment.acceptFood(food)) {
+                shipment.shipFoodToStorage(food);
+                break;
+            }
+        }
+    }
+
+    private long calculateExpiryDatePercentage(LocalDate today, LocalDate createDate, LocalDate expiryDate) {
+        return DAYS.between(createDate, today) * 100 / DAYS.between(createDate, expiryDate);
+    }
 }

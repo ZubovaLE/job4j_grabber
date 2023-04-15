@@ -14,4 +14,9 @@ public class Trash implements Storage {
     public void add(Food food) {
         foodInTrash.add(food);
     }
+
+    @Override
+    public List<Food> showProductsInStorage() {
+        return foodInTrash;
+    }
 }
