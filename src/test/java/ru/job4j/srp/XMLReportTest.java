@@ -14,7 +14,7 @@ class XMLReportTest {
     @DisplayName("Test generate when add two employees")
     void generate() {
         MemStore store = new MemStore();
-        Calendar now = new GregorianCalendar(2018, Calendar.FEBRUARY, 2);;
+        Calendar now = new GregorianCalendar(2018, Calendar.FEBRUARY, 2);
         Employee workerOne = new Employee("WorkerOne", now, now, 100);
         Employee workerTwo = new Employee("WorkerTwo", now, now, 150);
         store.add(workerOne);
