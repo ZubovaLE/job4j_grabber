@@ -17,9 +17,10 @@ public class TruckParking implements Parking {
 
     @Override
     public boolean park(Car car) {
-        if (checkFreeParkingSpaces() && car.getSize() > 1 && countFreeParkingSpaces() > 1) {
+        if (checkFreeParkingSpaces() && car.getSize() > 1 && countFreeParkingSpaces() >= 1) {
             carsOnParking.add(car);
             freeSpaces--;
+            return true;
         }
         return false;
     }
@@ -41,5 +42,10 @@ public class TruckParking implements Parking {
     @Override
     public int countFreeParkingSpaces() {
         return freeSpaces;
+    }
+
+    @Override
+    public Set<Car> getCarsOnParking() {
+        return carsOnParking;
     }
 }
