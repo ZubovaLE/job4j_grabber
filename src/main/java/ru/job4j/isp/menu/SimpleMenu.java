@@ -17,17 +17,12 @@ public class SimpleMenu implements Menu {
         return Optional.empty();
     }
 
-    @Override
-    public boolean hasNext() {
-        return false;
-    }
-
-    @Override
-    public MenuItemInfo next() {
+    private Optional<ItemInfo> findItem(String name) {
         return null;
     }
 
-    private Optional<ItemInfo> findItem(String name) {
+    @Override
+    public Iterator<MenuItemInfo> iterator() {
         return null;
     }
 
