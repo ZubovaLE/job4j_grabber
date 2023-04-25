@@ -9,7 +9,7 @@ public class SimpleMenu implements Menu {
 
     @Override
     public boolean add(String parentName, String childName, ActionDelegate actionDelegate) {
-        return false;
+        return rootElements.add(new SimpleMenuItem(parentName, actionDelegate));
     }
 
     @Override

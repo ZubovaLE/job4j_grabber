@@ -2,7 +2,6 @@ package ru.job4j.isp.menu;
 
 import lombok.Getter;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
