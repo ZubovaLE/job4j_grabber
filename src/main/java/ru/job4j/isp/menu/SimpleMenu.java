@@ -49,7 +49,7 @@ public class SimpleMenu implements Menu {
             this.name = name;
             this.actionDelegate = actionDelegate;
         }
-        
+
         @Override
         public String getName() {
             return name;
