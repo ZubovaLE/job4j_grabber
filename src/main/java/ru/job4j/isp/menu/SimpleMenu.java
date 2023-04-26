@@ -3,27 +3,40 @@ package ru.job4j.isp.menu;
 import lombok.AllArgsConstructor;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SimpleMenu implements Menu {
     private final List<MenuItem> rootElements = new ArrayList<>();
 
     @Override
     public boolean add(String parentName, String childName, ActionDelegate actionDelegate) {
-        return rootElements.add(new SimpleMenuItem(parentName, actionDelegate));
+        rootElements.add(new SimpleMenuItem(parentName, actionDelegate));
+        rootElements.add(new SimpleMenuItem(childName, actionDelegate));
+        return true;
     }
 
     @Override
     public Optional<MenuItemInfo> select(String itemName) {
-        return Optional.empty();
+        int index = rootElements.indexOf(
+                rootElements.stream()
+                        .filter(el -> el.getName().equals(itemName))
+                        .collect(Collectors.toList())
+                        .get(0));
+        return Optional.of(new MenuItemInfo(rootElements.get(index), String.valueOf(index)));
     }
 
     private Optional<ItemInfo> findItem(String name) {
-        return null;
+        return Optional.of(rootElements.stream()
+                .filter(item -> item.getName().equals(name))
+                .map(el -> new ItemInfo(el, String.valueOf(rootElements.indexOf(el))))
+                .collect(Collectors.toList()).get(0));
     }
 
     @Override
     public Iterator<MenuItemInfo> iterator() {
-        return null;
+        return rootElements.stream()
+                .map(e -> new MenuItemInfo(e, String.valueOf(rootElements.indexOf(e))))
+                .collect(Collectors.toList()).iterator();
     }
 
     private static class SimpleMenuItem implements MenuItem {
@@ -36,7 +49,7 @@ public class SimpleMenu implements Menu {
             this.name = name;
             this.actionDelegate = actionDelegate;
         }
-
+        
         @Override
         public String getName() {
             return name;
