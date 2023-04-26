@@ -3,7 +3,6 @@ package ru.job4j.isp.menu;
 import lombok.AllArgsConstructor;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SimpleMenu implements Menu {
     private final List<MenuItem> rootElements = new ArrayList<>();
@@ -17,33 +16,50 @@ public class SimpleMenu implements Menu {
 
     @Override
     public Optional<MenuItemInfo> select(String itemName) {
-        int index = rootElements.indexOf(
-                rootElements.stream()
-                        .filter(el -> el.getName().equals(itemName))
-                        .collect(Collectors.toList())
-                        .get(0));
-        return Optional.of(new MenuItemInfo(rootElements.get(index), String.valueOf(index)));
+        Optional<ItemInfo> optionalItemInfo = findItem(itemName);
+        if (optionalItemInfo.isPresent()) {
+            ItemInfo currentItemInfo = optionalItemInfo.get();
+            currentItemInfo.menuItem.getActionDelegate().delegate();
+            return Optional.of(new MenuItemInfo(currentItemInfo.menuItem, currentItemInfo.number));
+        }
+        return Optional.empty();
     }
 
     private Optional<ItemInfo> findItem(String name) {
-        return Optional.of(rootElements.stream()
-                .filter(item -> item.getName().equals(name))
-                .map(el -> new ItemInfo(el, String.valueOf(rootElements.indexOf(el))))
-                .collect(Collectors.toList()).get(0));
+        DFSIterator dfsIterator = new DFSIterator();
+        ItemInfo current;
+        while (dfsIterator.hasNext()) {
+            current = dfsIterator.next();
+            if (current.menuItem.getName().equals(name)) {
+                return Optional.of(current);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
     public Iterator<MenuItemInfo> iterator() {
-        return rootElements.stream()
-                .map(e -> new MenuItemInfo(e, String.valueOf(rootElements.indexOf(e))))
-                .collect(Collectors.toList()).iterator();
+        DFSIterator dfsIterator = new DFSIterator();
+        Iterator<MenuItemInfo> iterator = new Iterator<MenuItemInfo>() {
+            @Override
+            public boolean hasNext() {
+                return dfsIterator.hasNext();
+            }
+
+            @Override
+            public MenuItemInfo next() {
+                ItemInfo currentItemInfo = dfsIterator.next();
+                return new MenuItemInfo(currentItemInfo.menuItem, currentItemInfo.number);
+            }
+        };
+        return iterator;
     }
 
     private static class SimpleMenuItem implements MenuItem {
 
-        private String name;
-        private List<MenuItem> children = new ArrayList<>();
-        private ActionDelegate actionDelegate;
+        private final String name;
+        private final List<MenuItem> children = new ArrayList<>();
+        private final ActionDelegate actionDelegate;
 
         public SimpleMenuItem(String name, ActionDelegate actionDelegate) {
             this.name = name;
