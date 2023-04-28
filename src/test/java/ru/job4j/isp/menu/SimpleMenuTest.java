@@ -17,6 +17,8 @@ class SimpleMenuTest {
         menu.add("Сходить в магазин", "Купить продукты", STUB_ACTION);
         menu.add("Купить продукты", "Купить хлеб", STUB_ACTION);
         menu.add("Купить продукты", "Купить молоко", STUB_ACTION);
+        Printer printer = new Printer();
+        printer.print(menu);
         assertEquals(
                 new Menu.MenuItemInfo(
                         "Сходить в магазин", List.of("Купить продукты"), STUB_ACTION, "1."

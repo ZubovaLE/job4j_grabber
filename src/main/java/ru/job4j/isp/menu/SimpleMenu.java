@@ -9,9 +9,13 @@ public class SimpleMenu implements Menu {
 
     @Override
     public boolean add(String parentName, String childName, ActionDelegate actionDelegate) {
-        rootElements.add(new SimpleMenuItem(parentName, actionDelegate));
-        rootElements.add(new SimpleMenuItem(childName, actionDelegate));
-        return true;
+        Optional<ItemInfo> optionalItemInfo = findItem(parentName);
+        if (parentName.equals(Menu.ROOT) || optionalItemInfo.isPresent()) {
+            SimpleMenuItem childItem = new SimpleMenuItem(childName, actionDelegate);
+            optionalItemInfo.ifPresent(itemInfo -> itemInfo.menuItem.getChildren().add(childItem));
+            return rootElements.add(childItem);
+        }
+        return false;
     }
 
     @Override
@@ -40,7 +44,7 @@ public class SimpleMenu implements Menu {
     @Override
     public Iterator<MenuItemInfo> iterator() {
         DFSIterator dfsIterator = new DFSIterator();
-        Iterator<MenuItemInfo> iterator = new Iterator<MenuItemInfo>() {
+        return new Iterator<>() {
             @Override
             public boolean hasNext() {
                 return dfsIterator.hasNext();
@@ -52,7 +56,6 @@ public class SimpleMenu implements Menu {
                 return new MenuItemInfo(currentItemInfo.menuItem, currentItemInfo.number);
             }
         };
-        return iterator;
     }
 
     private static class SimpleMenuItem implements MenuItem {
@@ -119,8 +122,16 @@ public class SimpleMenu implements Menu {
     }
 
     @AllArgsConstructor
-    private class ItemInfo {
+    private static class ItemInfo {
         MenuItem menuItem;
         String number;
+
+        @Override
+        public String toString() {
+            return "ItemInfo{" +
+                    "menuItem=" + menuItem +
+                    ", number='" + number + '\'' +
+                    '}';
+        }
     }
 }

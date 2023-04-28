@@ -53,5 +53,15 @@ public interface Menu extends Iterable<Menu.MenuItemInfo> {
         public int hashCode() {
             return Objects.hash(name, children, number);
         }
+
+        @Override
+        public String toString() {
+            return "MenuItemInfo{" +
+                    "name='" + name + '\'' +
+                    ", children=" + children +
+                    ", actionDelegate=" + actionDelegate +
+                    ", number='" + number + '\'' +
+                    '}';
+        }
     }
 }
