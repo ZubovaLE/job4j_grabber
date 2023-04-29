@@ -1,7 +1,7 @@
 package ru.job4j.tdd;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ class CinemaTest {
         date.set(2020, Calendar.NOVEMBER, 10, 23, 0);
     }
 
-    @Ignore
+    @Disabled
     @Test
     @DisplayName("When buy successfully then return ticket")
     void whenBuySuccessfully() {
@@ -31,7 +31,7 @@ class CinemaTest {
         assertThat(ticket).isEqualTo(new Ticket3D());
     }
 
-    @Ignore
+    @Disabled
     @Test
     @DisplayName("Buy when already bought then return null")
     void buyWhenAlreadyBoughtThenNull() {
@@ -39,7 +39,7 @@ class CinemaTest {
         assertThat(cinema.buy(account, 1, 1, date)).isNull();
     }
 
-    @Ignore
+    @Disabled
     @Test
     @DisplayName("Buy when incorrect date then return null")
     void buyWhenIncorrectDateThenNull() {
@@ -47,28 +47,28 @@ class CinemaTest {
         assertThat(cinema.buy(account, 1, 1, date)).isNull();
     }
 
-    @Ignore
+    @Disabled
     @Test
     @DisplayName("Buy when incorrect row then return null")
     void buyWhenIncorrectRowThenNull() {
         assertThat(cinema.buy(account, -1, 1, date)).isNull();
     }
 
-    @Ignore
+    @Disabled
     @Test
     @DisplayName("Buy when incorrect row then return null")
     void buyWhenIncorrectColumnThenNull() {
         assertThat(cinema.buy(account, 1, -1, date)).isNull();
     }
 
-    @Ignore
+    @Disabled
     @Test
     @DisplayName("Buy when non-existent account then return null")
     void buyWhenNonExistentAccountThenNull() {
         assertThat(cinema.buy(null, 1, 1, date)).isNull();
     }
 
-    @Ignore
+    @Disabled
     @Test
     @DisplayName("When find successfully then return list of sessions")
     void whenFind() {
@@ -77,7 +77,7 @@ class CinemaTest {
         assertThat(sessions).isEqualTo(List.of(new Session3D()));
     }
 
-    @Ignore
+    @Disabled
     @Test
     @DisplayName("Find when no sessions then return empty list")
     public void whenNoSessionsThenEmptyList() {
