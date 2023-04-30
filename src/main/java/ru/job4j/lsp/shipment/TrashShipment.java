@@ -1,9 +1,8 @@
-package ru.job4j.ocp.shipment;
+package ru.job4j.lsp.shipment;
 
 import lombok.AllArgsConstructor;
-import ru.job4j.ocp.Food;
-import ru.job4j.ocp.storage.Storage;
-import ru.job4j.ocp.storage.Trash;
+import ru.job4j.lsp.Food;
+import ru.job4j.lsp.storage.Trash;
 
 import java.util.function.Predicate;
 

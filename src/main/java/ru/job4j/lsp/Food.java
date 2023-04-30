@@ -1,4 +1,4 @@
-package ru.job4j.ocp;
+package ru.job4j.lsp;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

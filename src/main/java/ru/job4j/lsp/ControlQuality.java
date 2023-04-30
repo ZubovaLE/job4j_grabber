@@ -1,9 +1,9 @@
-package ru.job4j.ocp;
+package ru.job4j.lsp;
 
-import ru.job4j.ocp.shipment.*;
-import ru.job4j.ocp.storage.Shop;
-import ru.job4j.ocp.storage.Trash;
-import ru.job4j.ocp.storage.Warehouse;
+import ru.job4j.lsp.shipment.*;
+import ru.job4j.lsp.storage.Shop;
+import ru.job4j.lsp.storage.Trash;
+import ru.job4j.lsp.storage.Warehouse;
 
 import java.time.*;
 import java.util.List;

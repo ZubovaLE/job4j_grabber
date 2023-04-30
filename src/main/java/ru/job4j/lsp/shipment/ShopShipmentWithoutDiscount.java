@@ -1,19 +1,19 @@
-package ru.job4j.ocp.shipment;
+package ru.job4j.lsp.shipment;
 
 import lombok.AllArgsConstructor;
-import ru.job4j.ocp.Food;
-import ru.job4j.ocp.storage.Warehouse;
+import ru.job4j.lsp.Food;
+import ru.job4j.lsp.storage.Shop;
 
 import java.util.function.Predicate;
 
 @AllArgsConstructor
-public class WarehouseShipment implements Shipment {
-    private Warehouse warehouse;
-    private Predicate<Food> predicate;
+public class ShopShipmentWithoutDiscount implements Shipment {
+    private final Shop shop;
+    Predicate<Food> predicate;
 
     @Override
     public void shipFoodToStorage(Food food) {
-        warehouse.add(food);
+        shop.add(food);
     }
 
     @Override

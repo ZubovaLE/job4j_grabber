@@ -1,6 +1,6 @@
-package ru.job4j.ocp.shipment;
+package ru.job4j.lsp.shipment;
 
-import ru.job4j.ocp.Food;
+import ru.job4j.lsp.Food;
 
 public interface Shipment {
     void shipFoodToStorage(Food food);

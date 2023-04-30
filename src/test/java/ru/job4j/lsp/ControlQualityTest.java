@@ -1,10 +1,12 @@
-package ru.job4j.ocp;
+package ru.job4j.lsp;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.job4j.ocp.storage.Shop;
-import ru.job4j.ocp.storage.Trash;
-import ru.job4j.ocp.storage.Warehouse;
+import ru.job4j.lsp.ControlQuality;
+import ru.job4j.lsp.Food;
+import ru.job4j.lsp.storage.Shop;
+import ru.job4j.lsp.storage.Trash;
+import ru.job4j.lsp.storage.Warehouse;
 
 import java.time.LocalDate;
 import java.time.Month;
