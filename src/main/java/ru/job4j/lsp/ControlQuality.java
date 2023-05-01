@@ -1,36 +1,33 @@
 package ru.job4j.lsp;
 
 import ru.job4j.lsp.shipment.*;
-import ru.job4j.lsp.storage.Shop;
-import ru.job4j.lsp.storage.Trash;
-import ru.job4j.lsp.storage.Warehouse;
+import ru.job4j.lsp.storage.*;
 
 import java.time.*;
-import java.util.List;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ControlQuality {
-    private final List<Shipment> shipments;
+    private final StorageConditionSetter storageConditionSetter;
 
-    public ControlQuality(Shop shop, Warehouse warehouse, Trash trash) {
-        shipments = List.of(
-                new TrashShipment(trash, food -> (food.getExpiryDate().isBefore(LocalDate.now()))),
-                new WarehouseShipment(warehouse, food -> food.getExpiryDate().isAfter(LocalDate.now()) &&
-                        calculateExpiryDatePercentage(LocalDate.now(), food.getCreateDate(), food.getExpiryDate()) < 25),
-                new ShopShipmentWithoutDiscount(shop, food ->
-                {
-                    long duration = calculateExpiryDatePercentage(LocalDate.now(), food.getCreateDate(), food.getExpiryDate());
-                    return duration >= 25 && duration <= 75;
-                }),
-                new DiscountShopShipment(shop, food -> calculateExpiryDatePercentage(LocalDate.now(), food.getCreateDate(), food.getExpiryDate()) > 75));
+    public ControlQuality(StorageConditionSetter storageConditionSetter) {
+        this.storageConditionSetter = storageConditionSetter;
     }
 
     public void sendFoodToCorrectStorage(Food food) {
-        for (Shipment shipment : shipments) {
+        for (Shipment shipment : storageConditionSetter.getShipments()) {
             if (shipment.acceptFood(food)) {
                 shipment.shipFoodToStorage(food);
                 break;
+            }
+        }
+    }
+
+    public void resort() {
+        for (Storage storage : storageConditionSetter.getStorages()) {
+            for (Food food : storage.showProductsInStorage()) {
+                storage.clear();
+                sendFoodToCorrectStorage(food);
             }
         }
     }

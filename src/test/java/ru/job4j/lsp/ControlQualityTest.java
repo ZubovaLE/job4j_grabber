@@ -3,6 +3,7 @@ package ru.job4j.lsp;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.job4j.lsp.storage.Shop;
+import ru.job4j.lsp.storage.StorageConditionSetter;
 import ru.job4j.lsp.storage.Trash;
 import ru.job4j.lsp.storage.Warehouse;
 
@@ -18,7 +19,8 @@ class ControlQualityTest {
         Shop shop = new Shop();
         Warehouse warehouse = new Warehouse();
         Trash trash = new Trash();
-        ControlQuality controlQuality = new ControlQuality(shop, warehouse, trash);
+        StorageConditionSetter storageConditionSetter = new StorageConditionSetter(shop, warehouse, trash);
+        ControlQuality controlQuality = new ControlQuality(storageConditionSetter);
         Food foodToWarehouse = new Food("Food One", LocalDate.now().plusDays(100), LocalDate.now().minusDays(1), 100.00, 50);
         Food foodToShop = new Food("Food Two", LocalDate.now().plusDays(50), LocalDate.now().minusDays(50), 100.00, 50);
         Food foodToShopWithDiscount = new Food("Food Three", LocalDate.now().plusDays(20), LocalDate.now().minusDays(80), 100.00, 80);

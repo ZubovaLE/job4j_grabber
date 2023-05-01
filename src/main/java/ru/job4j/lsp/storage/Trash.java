@@ -19,4 +19,9 @@ public class Trash implements Storage {
     public List<Food> showProductsInStorage() {
         return foodInTrash;
     }
+
+    @Override
+    public void clear() {
+        foodInTrash.clear();
+    }
 }

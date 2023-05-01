@@ -19,4 +19,9 @@ public class Shop implements Storage {
     public List<Food> showProductsInStorage() {
         return foodInShop;
     }
+
+    @Override
+    public void clear() {
+        foodInShop.clear();
+    }
 }
