@@ -29,9 +29,15 @@ class ControlQualityTest {
         controlQuality.sendFoodToCorrectStorage(foodToShop);
         controlQuality.sendFoodToCorrectStorage(foodToShopWithDiscount);
         controlQuality.sendFoodToCorrectStorage(foodToTrash);
-        assertThat(warehouse.showProductsInStorage()).hasSize(1).contains(foodToWarehouse);
-        assertThat(shop.showProductsInStorage()).hasSize(2).contains(foodToShop, foodToShopWithDiscount);
+        assertThat(warehouse.getAllProducts()).hasSize(1).contains(foodToWarehouse);
+        assertThat(shop.getAllProducts()).hasSize(2).contains(foodToShop, foodToShopWithDiscount);
         assertThat(foodToShopWithDiscount.getPrice()).isEqualTo(20);
-        assertThat(trash.showProductsInStorage()).hasSize(1).contains(foodToTrash);
+        assertThat(trash.getAllProducts()).hasSize(1).contains(foodToTrash);
+
+        controlQuality.resort();
+        assertThat(warehouse.getAllProducts()).hasSize(1).contains(foodToWarehouse);
+        assertThat(shop.getAllProducts()).hasSize(2).contains(foodToShop, foodToShopWithDiscount);
+        assertThat(foodToShopWithDiscount.getPrice()).isEqualTo(4);
+        assertThat(trash.getAllProducts()).hasSize(1).contains(foodToTrash);
     }
 }

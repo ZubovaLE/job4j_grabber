@@ -4,6 +4,8 @@ import ru.job4j.lsp.shipment.*;
 import ru.job4j.lsp.storage.*;
 
 import java.time.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -25,8 +27,9 @@ public class ControlQuality {
 
     public void resort() {
         for (Storage storage : storageConditionSetter.getStorages()) {
-            for (Food food : storage.showProductsInStorage()) {
-                storage.clear();
+            List<Food> old = new ArrayList<>(storage.getAllProducts());
+            storage.clear();
+            for (Food food : old) {
                 sendFoodToCorrectStorage(food);
             }
         }

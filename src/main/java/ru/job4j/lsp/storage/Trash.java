@@ -16,7 +16,7 @@ public class Trash implements Storage {
     }
 
     @Override
-    public List<Food> showProductsInStorage() {
+    public List<Food> getAllProducts() {
         return foodInTrash;
     }
 
