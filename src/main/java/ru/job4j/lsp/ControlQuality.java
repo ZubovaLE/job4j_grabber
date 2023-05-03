@@ -3,11 +3,8 @@ package ru.job4j.lsp;
 import ru.job4j.lsp.shipment.*;
 import ru.job4j.lsp.storage.*;
 
-import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ControlQuality {
     private final StorageConditionSetter storageConditionSetter;
@@ -33,9 +30,5 @@ public class ControlQuality {
                 sendFoodToCorrectStorage(food);
             }
         }
-    }
-
-    private long calculateExpiryDatePercentage(LocalDate today, LocalDate createDate, LocalDate expiryDate) {
-        return DAYS.between(createDate, today) * 100 / DAYS.between(createDate, expiryDate);
     }
 }
