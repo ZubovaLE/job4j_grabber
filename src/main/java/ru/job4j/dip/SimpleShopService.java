@@ -1,8 +1,5 @@
 package ru.job4j.dip;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
 import java.util.logging.Logger;
 
 public class SimpleShopService {
@@ -15,21 +12,6 @@ public class SimpleShopService {
         this.orderService = orderService;
     }
 
-    public boolean createBucket(User user) {
-        if (shopStore.getUsers().contains(user)) {
-            return false;
-        }
-        return shopStore.getUsers().add(user);
-    }
-//
-//    public boolean createOrder(User user, Order order) {
-//        Set<Order> orders = serviceDB.getOrDefault(user, Set.of());
-//        if (orders.isEmpty()) {
-//            return false;
-//        }
-//        return orders.add(order);
-//    }
-//
 //    public boolean addProduct(User user, Order order, Product product) {
 //        Optional<Order> orderDB = findOrder(user, order);
 //        if (orderDB.isEmpty()) {

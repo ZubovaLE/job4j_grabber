@@ -11,20 +11,21 @@ import static org.hamcrest.Matchers.*;
 class SimpleShopServiceTest {
 
     private SimpleShopService shopService;
+    private ShopStore shopStore = new InMemoryShopStore();
+    private OrderStore orderStore;
+    private OrderService orderService = new SimpleOrderService(orderStore);
     private User userOne;
     private User userTwo;
 
     @BeforeEach
     public void fillTable() {
-        shopService = new SimpleShopService();
+        shopService = new SimpleShopService(shopStore, orderService);
         userOne = new User(1, "One");
         userTwo = new User(2, "Two");
     }
 
     @Test
     void whenCreateBucketTwice() {
-        assertFalse(shopService.createBucket(userOne));
-        assertTrue(shopService.createBucket(userOne));
     }
 
     @Test
