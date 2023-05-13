@@ -11,7 +11,7 @@ public class Order {
     private int id;
 
     private boolean isPayed;
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
