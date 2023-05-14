@@ -3,6 +3,8 @@ package ru.job4j.dip;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.NoSuchElementException;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,6 +24,17 @@ class SimpleShopServiceTest {
         shopService = new SimpleShopService(shopStore, orderService);
         userOne = new User(1, "One");
         userTwo = new User(2, "Two");
+    }
+
+    @Test
+    void whenFindOrderDontFindOrders() {
+        //Given
+        int idUser = 10;
+        String name = "Alex";
+
+        //When
+        //Then
+        assertThrows(IllegalArgumentException.class, () -> shopService.payOrder(new User(idUser, name), new Order()));
     }
 
     @Test
