@@ -27,7 +27,7 @@ public class SimpleShopService {
                 .findFirst();
     }
 
-//    public boolean removeProduct(User user, Order order, Product product) {
+    //    public boolean removeProduct(User user, Order order, Product product) {
 //        Optional<Order> orderDB = findOrder(user, order);
 //        if (orderDB.isEmpty()) {
 //            return false;
@@ -46,11 +46,11 @@ public class SimpleShopService {
     public Check payOrder(User user, Order order) {
         Optional<Order> orderDB = findOrder(user, order);
         if (orderDB.isEmpty()) {
-            System.out.println("Get error with " + user + " " + order);
+            LOGGER.warning("Get error with " + user + " " + order);
             throw new IllegalArgumentException("Invalid order");
         }
         if (orderDB.get().isPayed()) {
-            System.out.println("Get error with " + user + " " + order);
+            LOGGER.warning("Get error with " + user + " " + order);
             throw new IllegalArgumentException("Already payed!");
         }
         orderDB.get().setPayed(true);

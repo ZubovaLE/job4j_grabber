@@ -1,4 +1,4 @@
 package ru.job4j.dip;
 
-public interface OrderService {
+public interface OrderService extends OrderStore {
 }
