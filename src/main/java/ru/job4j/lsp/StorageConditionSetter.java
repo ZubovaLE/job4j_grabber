@@ -1,6 +1,10 @@
-package ru.job4j.lsp.storage;
+package ru.job4j.lsp;
 
 import ru.job4j.lsp.shipment.*;
+import ru.job4j.lsp.storage.Shop;
+import ru.job4j.lsp.storage.Storage;
+import ru.job4j.lsp.storage.Trash;
+import ru.job4j.lsp.storage.Warehouse;
 
 import java.time.LocalDate;
 import java.util.List;

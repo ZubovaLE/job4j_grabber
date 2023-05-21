@@ -1,4 +1,4 @@
-package ru.job4j.lsp.exampleTwo;
+package ru.job4j.lsp.examples.exampleTwo;
 
 import java.time.LocalDate;
 

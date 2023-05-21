@@ -1,4 +1,4 @@
-package ru.job4j.lsp.exampleTwo;
+package ru.job4j.lsp.examples.exampleTwo;
 
 public class SecondRule {
     public static void main(String[] args) {

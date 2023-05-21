@@ -1,4 +1,4 @@
-package ru.job4j.lsp.exampleThree;
+package ru.job4j.lsp.examples.exampleThree;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

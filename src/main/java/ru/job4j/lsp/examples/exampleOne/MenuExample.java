@@ -1,4 +1,4 @@
-package ru.job4j.lsp.exampleOne;
+package ru.job4j.lsp.examples.exampleOne;
 
 public class MenuExample {
     // Precondition: 0 < num <= 5

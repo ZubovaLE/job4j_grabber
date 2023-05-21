@@ -1,4 +1,4 @@
-package ru.job4j.lsp.exampleOne;
+package ru.job4j.lsp.examples.exampleOne;
 
 public class OtherMenu extends MenuExample {
     @Override

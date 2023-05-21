@@ -1,4 +1,4 @@
-package ru.job4j.isp.menu.exampleThree;
+package ru.job4j.isp.examples.exampleThree;
 
 /**
  * Имеется интерфейс продукта.

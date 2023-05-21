@@ -1,4 +1,4 @@
-package ru.job4j.isp.menu.exampleOne;
+package ru.job4j.isp.examples.exampleOne;
 
 /**
  * Имеется интерфейс пирога.

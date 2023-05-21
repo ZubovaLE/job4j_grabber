@@ -1,4 +1,4 @@
-package ru.job4j.isp.menu.exampleTwo;
+package ru.job4j.isp.examples.exampleTwo;
 
 /**
  * Имеется интерфейс сотового телефона.

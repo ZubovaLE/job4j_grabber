@@ -1,4 +1,4 @@
-package ru.job4j.lsp.exampleThree;
+package ru.job4j.lsp.examples.exampleThree;
 
 public class ThirdRule {
     public static void main(String[] args) {
