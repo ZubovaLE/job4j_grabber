@@ -1,5 +1,7 @@
 package ru.job4j.isp.examples.exampleThree;
 
+import lombok.Getter;
+
 /**
  * Имеется интерфейс продукта.
  * Каждый продукт имеет имя, идентификатор и цену.
@@ -10,16 +12,12 @@ package ru.job4j.isp.examples.exampleThree;
  * добавить интерфейс ElectricalCharacteristics с
  * методами getInputVoltage(), getOutputVoltage(), getResistance()).
  */
-public interface Product {
-    String getName();
-
-    int getId();
-
-    float getPrice();
-
-    void getModel();
-
-    void getInputVoltage();
-
-    void getOutputVoltage();
+@Getter
+public abstract class Product {
+    private String name;
+    private int id;
+    private float price;
+    private String model;
+    private String inputVoltage;
+    private String outputVoltage;
 }

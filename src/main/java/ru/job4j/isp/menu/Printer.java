@@ -7,9 +7,16 @@ public class Printer implements MenuPrinter {
         for (Menu.MenuItemInfo menuItemInfo : menu) {
             int depth = menuItemInfo.getNumber().split("\\.").length;
             if (depth >= 2) {
-                builder.append("--".repeat(depth)).append(menuItemInfo.getNumber()).append(menuItemInfo.getName()).append(System.lineSeparator());
+                builder
+                        .append("--".repeat(depth))
+                        .append(menuItemInfo.getNumber())
+                        .append(menuItemInfo.getName())
+                        .append(System.lineSeparator());
             } else {
-                builder.append(menuItemInfo.getNumber()).append(menuItemInfo.getName()).append(System.lineSeparator());
+                builder
+                        .append(menuItemInfo.getNumber())
+                        .append(menuItemInfo.getName())
+                        .append(System.lineSeparator());
             }
         }
         System.out.println(builder);
