@@ -1,5 +1,6 @@
 package ru.job4j.lsp;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.job4j.lsp.storage.Shop;
@@ -11,7 +12,6 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.*;
 
 class ControlQualityTest {
-
     @Test
     @DisplayName("Test sendFoodToCorrectStorage")
     void sendFoodToCorrectStorage() {
@@ -19,8 +19,8 @@ class ControlQualityTest {
         Shop shop = new Shop();
         Warehouse warehouse = new Warehouse();
         Trash trash = new Trash();
-        StorageConditionSetter storageConditionSetter = new StorageConditionSetter(shop, warehouse, trash);
-        ControlQuality controlQuality = new ControlQuality(storageConditionSetter);
+        ShipmentConditions shipmentConditions = new ShipmentConditions(shop, warehouse, trash);
+        ControlQuality controlQuality = new ControlQuality(shipmentConditions);
         Food foodToWarehouse = new Food("Food One", LocalDate.now().plusDays(100), LocalDate.now().minusDays(1),
                 100.00, 50);
         Food foodToShop = new Food("Food Two", LocalDate.now().plusDays(50), LocalDate.now().minusDays(50),

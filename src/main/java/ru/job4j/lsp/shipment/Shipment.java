@@ -1,9 +1,19 @@
 package ru.job4j.lsp.shipment;
 
+import lombok.AllArgsConstructor;
 import ru.job4j.lsp.Food;
+import ru.job4j.lsp.storage.Storage;
 
-public interface Shipment {
-    void shipFoodToStorage(Food food);
+import java.util.function.Predicate;
 
-    boolean acceptFood(Food food);
+@AllArgsConstructor
+public abstract class Shipment {
+    protected final Storage storage;
+    protected Predicate<Food> predicate;
+
+    public abstract void shipFoodToStorage(Food food);
+
+    public boolean acceptFood(Food food) {
+        return predicate.test(food);
+    }
 }

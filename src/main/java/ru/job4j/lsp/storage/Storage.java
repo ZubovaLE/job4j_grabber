@@ -2,12 +2,21 @@ package ru.job4j.lsp.storage;
 
 import ru.job4j.lsp.Food;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public interface Storage {
-    void add(Food food);
+public abstract class Storage {
+    private final List<Food> foodInStorage = new ArrayList<>();
 
-    List<Food> getAllProducts();
+    public void add(Food food) {
+        foodInStorage.add(food);
+    }
 
-    void clear();
+    public List<Food> getAllProducts() {
+        return foodInStorage;
+    }
+
+    public void clear() {
+        foodInStorage.clear();
+    }
 }

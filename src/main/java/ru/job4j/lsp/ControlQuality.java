@@ -1,20 +1,20 @@
 package ru.job4j.lsp;
 
 import ru.job4j.lsp.shipment.*;
-import ru.job4j.lsp.storage.*;
+import ru.job4j.lsp.storage.Storage;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ControlQuality {
-    private final StorageConditionSetter storageConditionSetter;
+    private final ShipmentConditions shipmentConditions;
 
-    public ControlQuality(StorageConditionSetter storageConditionSetter) {
-        this.storageConditionSetter = storageConditionSetter;
+    public ControlQuality(ShipmentConditions shipmentConditions) {
+        this.shipmentConditions = shipmentConditions;
     }
 
     public void sendFoodToCorrectStorage(Food food) {
-        for (Shipment shipment : storageConditionSetter.getShipments()) {
+        for (Shipment shipment : shipmentConditions.getShipments()) {
             if (shipment.acceptFood(food)) {
                 shipment.shipFoodToStorage(food);
                 break;
@@ -23,12 +23,14 @@ public class ControlQuality {
     }
 
     public void resort() {
-        for (Storage storage : storageConditionSetter.getStorages()) {
-            List<Food> old = new ArrayList<>(storage.getAllProducts());
-            storage.clear();
-            for (Food food : old) {
-                sendFoodToCorrectStorage(food);
-            }
-        }
+        List<Food> allProducts = collectAllProductsFromStorages();
+        shipmentConditions.getStorages().forEach(Storage::clear);
+        allProducts.forEach(this::sendFoodToCorrectStorage);
+    }
+
+    private List<Food> collectAllProductsFromStorages() {
+        return shipmentConditions.getStorages().stream()
+                .flatMap(s -> s.getAllProducts().stream())
+                .collect(Collectors.toList());
     }
 }
