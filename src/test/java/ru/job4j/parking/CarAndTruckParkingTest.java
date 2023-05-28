@@ -1,6 +1,7 @@
 package ru.job4j.parking;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -34,8 +35,8 @@ class CarAndTruckParkingTest {
                           int expectedParkingAmountOfCars, Set<Car> expectedCarsOnParking,
                           int expectedCarParkingAmountOfCars, Set<Car> expectedCarsOnCarParking,
                           int expectedTruckParkingAmountOfCars, Set<Car> ExpectedCarsOnTruckParking) {
-        CarParking carParking = new CarParking(totalCarParkingSpaces);
-        TruckParking truckParking = new TruckParking(totalTruckParkingSpaces);
+        Parking carParking = new CarParking(totalCarParkingSpaces);
+        Parking truckParking = new TruckParking(totalTruckParkingSpaces);
         CarAndTruckParking parking = new CarAndTruckParking(carParking, truckParking);
         parking.park(passengerCar);
         parking.park(truck);

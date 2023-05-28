@@ -1,15 +1,18 @@
 package ru.job4j.parking;
 
-import lombok.AllArgsConstructor;
 import ru.job4j.parking.car.Car;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@AllArgsConstructor
 public class CarAndTruckParking implements Parking {
-    private final CarParking carParking;
-    private final TruckParking truckParking;
+    private final Parking carParking;
+    private final Parking truckParking;
+
+    public CarAndTruckParking(Parking carParking, Parking truckParking) {
+        this.carParking = carParking;
+        this.truckParking = truckParking;
+    }
 
     @Override
     public boolean park(Car car) {
