@@ -4,21 +4,20 @@ public class Printer implements MenuPrinter {
     @Override
     public void print(Menu menu) {
         StringBuilder builder = new StringBuilder();
+        int depth;
         for (Menu.MenuItemInfo menuItemInfo : menu) {
-            int depth = menuItemInfo.getNumber().split("\\.").length;
-            if (depth >= 2) {
-                builder
-                        .append("--".repeat(depth))
-                        .append(menuItemInfo.getNumber())
-                        .append(menuItemInfo.getName())
-                        .append(System.lineSeparator());
-            } else {
-                builder
-                        .append(menuItemInfo.getNumber())
-                        .append(menuItemInfo.getName())
-                        .append(System.lineSeparator());
-            }
+            depth = menuItemInfo.getNumber().split("\\.").length;
+            builder.append(depth >= 2 ? "--".repeat(depth) : "");
+            buildMenuLine(builder, menuItemInfo);
         }
         System.out.println(builder);
+    }
+
+    private void buildMenuLine(StringBuilder builder, Menu.MenuItemInfo menuItemInfo) {
+        builder
+                .append(menuItemInfo.getNumber())
+                .append(" ")
+                .append(menuItemInfo.getName())
+                .append(System.lineSeparator());
     }
 }
