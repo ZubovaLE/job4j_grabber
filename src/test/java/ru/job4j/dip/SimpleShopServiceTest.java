@@ -2,13 +2,10 @@ package ru.job4j.dip;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.NoSuchElementException;
+import ru.job4j.dip.examples.courseExample.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 class SimpleShopServiceTest {
 

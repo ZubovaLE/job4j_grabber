@@ -1,11 +1,13 @@
 package ru.job4j.lsp;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.job4j.lsp.storage.Shop;
-import ru.job4j.lsp.storage.Trash;
-import ru.job4j.lsp.storage.Warehouse;
+import ru.job4j.lsp.foodStorage.ControlQuality;
+import ru.job4j.lsp.foodStorage.Food;
+import ru.job4j.lsp.foodStorage.ShipmentConditions;
+import ru.job4j.lsp.foodStorage.storage.Shop;
+import ru.job4j.lsp.foodStorage.storage.Trash;
+import ru.job4j.lsp.foodStorage.storage.Warehouse;
 
 import java.time.LocalDate;
 
