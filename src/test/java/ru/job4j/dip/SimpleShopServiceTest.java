@@ -12,7 +12,7 @@ class SimpleShopServiceTest {
     private SimpleShopService shopService;
     private ShopStore shopStore = new InMemoryShopStore();
     private OrderStore orderStore;
-    private OrderService orderService = new SimpleOrderService(orderStore);
+    private OrderService orderService = new SimpleOrderService();
     private User userOne;
     private User userTwo;
 

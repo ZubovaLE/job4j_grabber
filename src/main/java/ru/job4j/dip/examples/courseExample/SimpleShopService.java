@@ -3,7 +3,6 @@ package ru.job4j.dip.examples.courseExample;
 import lombok.AllArgsConstructor;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.logging.Logger;
 
 @AllArgsConstructor
@@ -12,35 +11,30 @@ public class SimpleShopService implements ShopService {
     private final OrderService orderService;
     private static final Logger LOGGER = Logger.getLogger("Shop logger");
 
-//    public boolean addProduct(User user, Order order, Product product) {
-//        Optional<Order> orderDB = findOrder(user, order);
-//        if (orderDB.isEmpty()) {
-//            return false;
-//        }
-//        return orderDB.get().add(product);
-//    }
-
-    private Optional<Order> findOrder(User user, Order order) {
-        return shopStore.getOrders(user).stream()
-                .filter(o -> o.getId() == order.getId())
-                .findFirst();
+    @Override
+    public boolean createBucket(User user) {
+        return shopStore.saveUser(user);
     }
 
-    //    public boolean removeProduct(User user, Order order, Product product) {
-//        Optional<Order> orderDB = findOrder(user, order);
-//        if (orderDB.isEmpty()) {
-//            return false;
-//        }
-//        return orderDB.get().remove(product.getId());
-//    }
-//
+    @Override
+    public boolean createOrder(User user, Order order) {
+        return shopStore.saveOrder(user, order) && orderService.createOrderBucket(order);
+    }
+
+    @Override
+    public boolean addProduct(User user, Order order, Product product) {
+        Optional<Order> orderDB = findOrder(user, order);
+        if (orderDB.isEmpty()) {
+            return false;
+        }
+        return orderService.addProduct(orderDB.get(), product);
+    }
+
     @Override
     public boolean removeOrder(User user, Order order) {
         Optional<User> orderOwner = shopStore.getUsers().stream().filter(u -> u.equals(user)).findFirst();
-        if (orderOwner.isPresent()) {
-            return shopStore.getOrders(orderOwner.get()).remove(order);
-        }
-        return false;
+        return orderOwner.filter(value -> shopStore.getOrders(value).remove(order)).isPresent()
+                && orderService.removeOrder(order);
     }
 
     @Override
@@ -56,5 +50,12 @@ public class SimpleShopService implements ShopService {
         }
         orderDB.get().setPayed(true);
         return new Check((int) (System.currentTimeMillis() % 1000_000), "Payed: " + orderDB.get().getId());
+    }
+
+
+    private Optional<Order> findOrder(User user, Order order) {
+        return shopStore.getOrders(user).stream()
+                .filter(o -> o.getId() == order.getId())
+                .findFirst();
     }
 }
