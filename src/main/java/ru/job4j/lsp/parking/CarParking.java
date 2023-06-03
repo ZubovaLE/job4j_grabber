@@ -2,7 +2,7 @@ package ru.job4j.lsp.parking;
 
 import ru.job4j.lsp.parking.car.Car;
 
-public class CarParking extends AbstractParking implements Parking {
+public class CarParking extends AbstractParking {
 
     public CarParking(int totalParkingSpaces) {
         super(totalParkingSpaces);

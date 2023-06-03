@@ -4,7 +4,7 @@ import ru.job4j.lsp.parking.car.Car;
 
 import java.util.Set;
 
-public class TruckParking extends AbstractParking implements Parking {
+public class TruckParking extends AbstractParking {
     public TruckParking(int totalParkingSpaces) {
         super(totalParkingSpaces);
     }

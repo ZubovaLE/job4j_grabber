@@ -5,7 +5,7 @@ import ru.job4j.lsp.parking.car.Car;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractParking {
+public abstract class AbstractParking implements Parking {
     protected final int totalParkingSpaces;
     protected int freeSpaces;
     protected Set<Car> carsOnParking = new HashSet<>();
@@ -33,4 +33,8 @@ public abstract class AbstractParking {
     public Set<Car> getCarsOnParking() {
         return carsOnParking;
     }
+
+    abstract public boolean park(Car car);
+
+    abstract public boolean leaveParking(Car car);
 }
