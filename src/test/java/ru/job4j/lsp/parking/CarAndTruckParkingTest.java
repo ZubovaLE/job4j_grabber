@@ -1,6 +1,7 @@
 package ru.job4j.lsp.parking;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -40,7 +41,9 @@ class CarAndTruckParkingTest {
         parking.park(passengerCar);
         parking.park(truck);
         assertThat(parking.getCarsOnParking()).hasSize(expectedParkingAmountOfCars).containsAll(expectedCarsOnParking);
-        assertThat(carParking.getCarsOnParking()).hasSize(expectedCarParkingAmountOfCars).containsAll(expectedCarsOnCarParking);
-        assertThat(truckParking.getCarsOnParking()).hasSize(expectedTruckParkingAmountOfCars).containsAll(ExpectedCarsOnTruckParking);
+        assertThat(carParking.getCarsOnParking()).hasSize(expectedCarParkingAmountOfCars)
+                .containsAll(expectedCarsOnCarParking);
+        assertThat(truckParking.getCarsOnParking()).hasSize(expectedTruckParkingAmountOfCars)
+                .containsAll(ExpectedCarsOnTruckParking);
     }
 }
