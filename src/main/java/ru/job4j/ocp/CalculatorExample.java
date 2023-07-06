@@ -3,7 +3,7 @@ package ru.job4j.ocp;
 import java.util.function.BiFunction;
 
 public class CalculatorExample {
-    private static class SimpleCalculator extends AbstractCalculator<Integer> {
+    public static class SimpleCalculator extends AbstractCalculator<Integer> {
         public int sum(int a, int b) {
             return calculate(Integer::sum, a, b);
         }
